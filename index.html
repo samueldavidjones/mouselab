@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Search and decision-making study</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.6;color:#222;background:#f5f5f0;display:flex;justify-content:center;padding:20px}
+#app{max-width:1040px;width:100%;background:#fff;border:1px solid #ccc;border-radius:4px;padding:44px 48px;min-height:600px}
+.screen{display:none}.screen.active{display:block}
+h1{font-size:1.5em;margin-bottom:.8em}h2{font-size:1.2em;margin-bottom:.6em}p{margin-bottom:.8em}
+button{font-family:inherit;font-size:1em;padding:10px 28px;background:#2a5a8a;color:#fff;border:none;border-radius:3px;cursor:pointer;margin-top:12px}
+button:hover{background:#1d4068}button:disabled{background:#999;cursor:not-allowed}
+input[type="text"],input[type="number"],textarea,select{font-family:inherit;font-size:1em;padding:6px 10px;border:1px solid #aaa;border-radius:3px;width:100%;max-width:400px}
+textarea{max-width:100%;min-height:80px}
+.consent-item{margin:8px 0;display:flex;align-items:flex-start;gap:8px}.consent-item input{margin-top:5px;flex-shrink:0}
+.quiz-q{margin-bottom:18px}.quiz-q label{display:block;margin:3px 0 3px 20px;cursor:pointer}
+.err{color:#c00;font-size:.9em}.mt{margin-top:20px}.small{font-size:.85em;color:#666}
+#task-canvas{border:1px solid #ccc;background:#fafaf5;display:block;margin:0 auto;width:700px;height:500px}
+.phase-label{display:inline-block;padding:3px 12px;border-radius:3px;font-size:.85em;font-weight:bold}
+.phase-plan{background:#d4edfc;color:#1a5276}.phase-act{background:#d5f5e3;color:#1e7d32}.phase-done{background:#f9e79f;color:#7d6608}
+#btn-execute{background:#27ae60;font-size:1.1em;padding:10px 30px}#btn-execute:hover{background:#1e8449}
+#btn-stop{background:#c0392b;font-size:1.1em;padding:10px 30px}#btn-stop:hover{background:#962d22}
+.cost-box{display:inline-block;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:.95em;background:#fdecea;color:#a93226;margin-right:8px}
+.cost-box.flash{animation:costflash .5s}
+@keyframes costflash{0%{background:#e74c3c;color:#fff}100%{background:#fdecea;color:#a93226}}
+.q-item{font-size:1.25em;min-height:4.2em;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px 20px;margin:18px 0 22px;background:#fafaf5;border:1px solid #e3e3da;border-radius:6px;transition:opacity .25s ease}
+.q-item.fade{opacity:0}
+.q-opts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.q-opt{flex:1 1 0;min-width:100px;max-width:170px;margin-top:0;padding:12px 8px;background:#fff;color:#1d4068;border:2px solid #2a5a8a;font-size:.95em;line-height:1.3}
+.q-opt:hover{background:#e8f1fa}.q-opt.sel{background:#2a5a8a;color:#fff}
+.q-opts.locked .q-opt{opacity:.45;cursor:default}.q-opts.locked .q-opt:hover{background:#fff}
+.form-row{margin-bottom:14px}.form-row label{display:block;margin-bottom:4px;font-weight:bold}
+.score-box{display:inline-block;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:.95em;background:#daeaf6;color:#1a5276;float:right}
+.pair-box{cursor:pointer;text-align:center;padding:16px 24px;border:2px solid #ddd;border-radius:8px;background:#fdebd0;transition:border-color .15s}
+.pair-box:hover{border-color:#2a5a8a}.pair-box.chosen{border-color:#27ae60;background:#d5f5e3}
+/* questionnaires */
+.qtable{width:100%;border-collapse:collapse;margin:10px 0 18px}
+.qtable th{font-size:.8em;font-weight:normal;color:#555;text-align:center;padding:6px 4px;vertical-align:bottom;border-bottom:2px solid #999}
+.qtable th:first-child{text-align:left}
+.qtable td{padding:9px 4px;border-bottom:1px solid #eee;vertical-align:middle}
+.qtable td.opt{text-align:center;width:12%}
+.qtable td.opt input{cursor:pointer;transform:scale(1.2)}
+.qtable tr.missing td{background:#fdecea}
+.support{background:#eef5ee;border-left:4px solid #4f7d62;padding:14px 20px;margin:18px 0}
+.support ul{margin:8px 0 8px 20px}.support li{margin:6px 0}
+.alert{background:#fdecea;border-left:4px solid #c0392b;padding:14px 20px;margin:18px 0}
+.support h3{font-size:1.02em;margin:16px 0 4px}
+.credit-box{background:#e8f1fa;border-left:4px solid #2a5a8a;padding:14px 20px;margin:18px 0}
+.cost-warning{border:3px solid #2a5a8a;background:#e8f1fa;border-radius:6px;padding:16px 22px;margin:4px 0 18px}
+.free-notice{border:2px solid #4f7d62;background:#e9f5ec;border-radius:6px;padding:12px 20px;margin:4px 0 18px;font-weight:bold;color:#2f5d43}
+.cost-warning .cw-head{font-size:1.3em;font-weight:bold;color:#1d4068;margin-bottom:6px}
+.note{background:#f4f0e4;border-left:4px solid #b3a06a;padding:12px 18px;margin:16px 0}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ================= WELCOME ================= -->
+<div class="screen active" id="scr-pid">
+  <h1>Welcome</h1>
+  <p>Please note that it <strong>is only possible to complete this task on a desktop or laptop computer with a keyboard</strong>.</p>
+  <p>Participants on tablets or mobile phones will not be able to complete the task and so will not receive course credit.</p>
+  <p>If you are working on a desktop computer and are happy to continue, <span id="pid-ask">please enter your SONA participant ID below.</span><span id="pid-auto" style="display:none">please click Continue.</span></p>
+  <div class="form-row" id="pid-row" style="margin-top:24px"><label>SONA participant ID</label><input type="text" id="inp-pid"></div>
+  <p class="err" id="pid-err"></p><button onclick="submitPid()">Continue</button>
+</div>
+
+<!-- ================= INFORMATION SHEET ================= -->
+<div class="screen" id="scr-info">
+  <h1>Information sheet</h1>
+  <p>You are invited to take part in a research study. Please read the description carefully. If you are happy to participate, click the 'Continue' button at the bottom of the page.</p>
+  <h2>What is the purpose of this study?</h2>
+  <p>This study will help us understand how people search for information and make decisions under uncertainty, and how this relates to everyday experiences of mood, worry, anxiety and habits such as checking. Improving our understanding of these processes could have implications for education, health, and everyday decision-making.</p>
+  <h2>What is involved in the study?</h2>
+  <p>To start, we will explain a decision-making task and ask a few comprehension questions so that we can be sure you understand the task before you begin. You will then complete four blocks of the task. After some blocks we will ask a few short questions about what you learned. Finally, you will complete four short questionnaires about your mood, worry, everyday habits (such as checking) and how you respond to uncertainty, and some optional demographic questions. The whole study should take approximately 25 minutes.</p>
+  <h2>Are there any risks or disadvantages?</h2>
+  <p>The questionnaires ask about things such as low mood, sleep, worry and anxiety over the last two weeks. Most people find these questions straightforward, but some people may find them uncomfortable. You can stop at any time. The questionnaires are not a diagnostic assessment, and because your answers are anonymised we cannot give you feedback on them or contact you about them. Details of organisations that offer free, confidential support are provided at the end of the study.</p>
+  <h2>What will I receive for taking part?</h2>
+  <p>You will receive course credit through SONA for taking part. Please try to earn as many points as you can in the task.</p>
+  <h2>What if I don't want to take part?</h2>
+  <p>Your participation is completely voluntary, so it is up to you whether you would like to take part. You can withdraw from the study at any point without having to provide any explanation. After the study is complete, you can withdraw your data for up to four weeks by contacting the research team (contact details below). After four weeks, data will be fully anonymised and it will no longer be possible to identify your individual data.</p>
+  <h2>Will my taking part in the study be kept confidential?</h2>
+  <p>Yes, your responses and data will be treated as strictly confidential. Giving basic demographic information (e.g., age, first language) at the end of the study is optional, and we request only your participant ID and digital initials as part of the consent process. Your IP address is not recorded in the dataset used for analysis.</p>
+  <h2>What will happen to my data?</h2>
+  <p>The Data Protection Act 2018 and UK General Data Protection Regulations allow you control over your personal data and how it is used. Under GDPR, Bangor University is the data controller in relation to your personal data and will process your data for the purposes of this study. Your answers about mood and anxiety count as health-related information and will be handled with particular care. Digital research data will be stored on a password-protected computer. At the end of the study, the anonymised dataset may be deposited on a publicly available data repository so that other scientists can examine our results.</p>
+  <h2>Who is running the study?</h2>
+  <p>This study is led by Dr Sam Jones of Bangor University's Department of Psychology. The study has been given a favourable opinion by a Bangor University Research Ethics Committee.</p>
+  <h2>Who do I contact if I have concerns?</h2>
+  <p>If you have a concern about any aspect of this study, please contact Dr Sam Jones via email at <a href="mailto:samuel.jones@bangor.ac.uk">samuel.jones@bangor.ac.uk</a>. Alternatively, you might contact Bangor University's Senior Research Governance &amp; Policy Officer directly at <a href="mailto:seniorresearchgovofficer@bangor.ac.uk">seniorresearchgovofficer@bangor.ac.uk</a>.</p>
+  <button onclick="showScreen('scr-consent')">Continue</button>
+</div>
+
+<!-- ================= CONSENT ================= -->
+<div class="screen" id="scr-consent">
+  <h1>Consent form</h1>
+  <div class="consent-item"><input type="checkbox" id="c1"><span>I have read and understood the information sheet.</span></div>
+  <div class="consent-item"><input type="checkbox" id="c2"><span>I understand that my participation is voluntary and I can withdraw at any time.</span></div>
+  <div class="consent-item"><input type="checkbox" id="c3"><span>I understand my data will be anonymised and handled in accordance with UK GDPR.</span></div>
+  <div class="consent-item"><input type="checkbox" id="c4"><span>I consent to my anonymised data being shared in open-access repositories.</span></div>
+  <div class="consent-item"><input type="checkbox" id="c6"><span>I understand that I will be asked questions about my mood, worry, anxiety and everyday habits, that these are not a diagnostic assessment, and that I will not receive individual feedback on my answers.</span></div>
+  <div class="consent-item"><input type="checkbox" id="c5"><span>I agree to take part in this study.</span></div>
+  <div class="form-row mt"><label>Digital signature (initials)</label><input type="text" id="inp-sig" maxlength="10"></div>
+  <p class="err" id="consent-err"></p><button onclick="submitConsent()">I consent — continue</button>
+</div>
+
+<!-- ================= INSTRUCTIONS ================= -->
+<div class="screen" id="scr-instructions">
+  <h1>Task instructions</h1>
+  <p>You will see a branching network with a <strong>starting location</strong> (blue circle) and 16 other locations for you to search.</p>
+  <p>Each location hides a reward value. To reveal a value, <strong>click on it</strong>.</p>
+  <p>You can only click locations <strong>next to already-revealed locations</strong>. These are highlighted in orange.</p>
+  <p>Once you have revealed the values of some locations, press the <strong>'Execute plan'</strong> button and then use your keyboard's <strong>arrow keys</strong> to move around and collect the reward values. Note that you can only move to revealed locations and can only move in one direction (you can't go back on yourself).</p>
+  <p>Note also that you don't have to navigate to the end of a path. Just click the <strong>'Stop here'</strong> button (or press the <strong>spacebar</strong>) when navigating if you would like to stop at your current location.</p>
+  <p>Your score equals <strong>the sum of the rewards along the path you took</strong>. You do not need to search every location.</p>
+  <p><strong>Try to maximise your overall score</strong>.</p>
+  <button onclick="showScreen('scr-practice-intro')">Continue to practice</button>
+</div>
+
+<div class="screen" id="scr-practice-intro">
+  <h1>Practice trials</h1>
+  <p>You will now do <strong>two practice trials</strong>. These do not count toward your score.</p>
+  <button onclick="startPractice()">Begin practice</button>
+</div>
+
+<!-- ================= TASK ================= -->
+<div class="screen" id="scr-task">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+    <span id="task-block-label" class="small"></span><span><span id="task-cost-box" class="cost-box" style="display:none"></span><span id="task-score-box" class="score-box" style="display:none;float:none"></span></span>
+  </div>
+  <p id="task-status"></p>
+  <div style="text-align:center"><canvas id="task-canvas" width="1400" height="1000"></canvas></div>
+  <div style="text-align:center;margin-top:8px"><button id="btn-execute" style="display:none" onclick="executePhase()">Execute plan</button><button id="btn-stop" style="display:none" onclick="stopHere()">Stop here</button></div>
+</div>
+
+<!-- ================= QUIZ ================= -->
+<div class="screen" id="scr-quiz">
+  <h1>Comprehension quiz</h1>
+  <div class="quiz-q"><p>1. What does clicking on a location do?</p>
+    <label><input type="radio" name="q1" value="a"> Moves you there</label>
+    <label><input type="radio" name="q1" value="b"> Removes it</label>
+    <label><input type="radio" name="q1" value="c"> Reveals the hidden reward</label></div>
+  <div class="quiz-q"><p>2. During execution, which locations can you move to?</p>
+    <label><input type="radio" name="q2" value="a"> Only positive-reward locations</label>
+    <label><input type="radio" name="q2" value="b"> Any</label>
+    <label><input type="radio" name="q2" value="c"> Only revealed locations</label></div>
+  <div class="quiz-q"><p>3. How do you navigate during execution?</p>
+    <label><input type="radio" name="q3" value="a"> Arrow keys</label>
+    <label><input type="radio" name="q3" value="b"> Click on the locations</label>
+    <label><input type="radio" name="q3" value="c"> Type the location number</label></div>
+  <div class="quiz-q"><p>4. How do you stop early during navigation?</p>
+    <label><input type="radio" name="q4" value="a"> Press Escape</label>
+    <label><input type="radio" name="q4" value="b"> Right-click</label>
+    <label><input type="radio" name="q4" value="c"> Click the 'Stop here' button (or press the spacebar)</label></div>
+  <div class="quiz-q"><p>5. Your trial score is:</p>
+    <label><input type="radio" name="q5" value="a"> The sum of the rewards along the path you took</label>
+    <label><input type="radio" name="q5" value="b"> Number of locations revealed</label>
+    <label><input type="radio" name="q5" value="c"> Reward at the final location only</label></div>
+  <div class="quiz-q"><p>6. How do you do well in this task?</p>
+    <label><input type="radio" name="q6" value="a"> Complete the task as quickly as possible</label>
+    <label><input type="radio" name="q6" value="b"> Click as many locations as possible</label>
+    <label><input type="radio" name="q6" value="c"> Earn as many points as possible</label></div>
+  <p class="err" id="quiz-err"></p><button onclick="submitQuiz()">Submit</button>
+</div>
+
+<!-- ================= BLOCK INTRO ================= -->
+<div class="screen" id="scr-block-intro">
+  <h1 id="block-intro-title"></h1>
+  <div id="block-intro-text"></div>
+  <div id="block-intro-cc" style="background:#fdebd0;border-radius:6px;padding:16px 20px;margin-top:16px">
+    <p id="bcc-title" style="font-weight:bold;margin-bottom:8px">Brief comprehension check</p>
+    <div id="bcc-questions"></div>
+    <button id="btn-check-cc" onclick="submitBlockCC()" style="margin-top:14px">Check answers</button>
+    <p class="err" id="bcc-err"></p>
+  </div>
+  <button id="btn-start-block" onclick="startBlock()">Begin</button>
+</div>
+
+<div class="screen" id="scr-block-rating">
+  <h1>How did you do?</h1>
+  <p>Compared with <strong>other people taking part in this study</strong>, how well do you think you did in the block you just completed?</p>
+  <div style="text-align:center;max-width:560px;margin:36px auto 0">
+    <div style="display:flex;align-items:center;gap:12px;justify-content:center">
+      <span style="font-size:.95em;color:#666">Worse than<br>everyone</span>
+      <input type="range" min="0" max="100" value="50" step="1" id="br-slider" style="flex:1;max-width:360px;opacity:0.35" oninput="this.style.opacity='1';this.dataset.touched='1'" onpointerdown="this.style.opacity='1';this.dataset.touched='1'">
+      <span style="font-size:.95em;color:#666">Better than<br>everyone</span>
+    </div>
+  </div>
+  <p class="err" id="br-err" style="text-align:center"></p>
+  <div style="text-align:center"><button onclick="submitBlockRating()">Continue</button></div>
+</div>
+
+<div class="screen" id="scr-strategy">
+  <h1>Strategy reflection</h1>
+  <p>Please briefly describe your strategy in the block you just completed. For instance, how did you decide when to stop searching?</p>
+  <textarea id="strategy-text"></textarea>
+  <p class="err" id="strategy-err"></p>
+  <button onclick="submitStrategy()">Continue</button>
+</div>
+
+<div class="screen" id="scr-separator">
+  <h1>Block complete</h1>
+  <p>Well done. If you need to, take a quick breather, stretch, and refresh.</p>
+  <p>Click continue when ready.</p>
+  <button onclick="advanceToNextBlock()">Continue</button>
+</div>
+
+<!-- ================= VALUE ESTIMATES ================= -->
+<div class="screen" id="scr-val-est">
+  <h1>Value estimation</h1>
+  <p>What do you think the <strong>average reward</strong> is for this symbol, in the block you just completed?</p>
+  <p id="ve-progress" class="small"></p>
+  <div style="text-align:center;margin:20px 0">
+    <div style="display:inline-block;padding:20px 28px;border:2px solid #ddd;border-radius:8px;background:#fdebd0"><canvas width="150" height="150" id="ve-sym-cv" style="width:75px;height:75px"></canvas></div>
+  </div>
+  <div style="text-align:center;margin:16px 0">
+    <label style="font-weight:bold">Estimated average value:</label><br>
+    <input type="number" id="ve-value" step="1" style="max-width:120px;text-align:center;margin-top:6px">
+  </div>
+  <div style="text-align:center;max-width:520px;margin:28px auto 0">
+    <p>How confident are you in this estimate?</p>
+    <div style="display:flex;align-items:center;gap:12px;justify-content:center">
+      <span style="font-size:.95em;color:#666">Not very<br>confident</span>
+      <input type="range" min="1" max="10" value="5" step="1" id="ve-conf" style="flex:1;max-width:340px;opacity:0.35" oninput="this.style.opacity='1';this.dataset.touched='1'" onpointerdown="this.style.opacity='1';this.dataset.touched='1'">
+      <span style="font-size:.95em;color:#666">Very<br>confident</span>
+    </div>
+  </div>
+  <p class="err" id="ve-err" style="text-align:center"></p>
+  <div style="text-align:center"><button onclick="submitValEst()">Next</button></div>
+</div>
+
+<!-- ================= PAIRED CHOICE ================= -->
+<div class="screen" id="scr-pairs">
+  <h1>Symbol knowledge test</h1>
+  <p>Which symbol do you think was <strong>generally worth more</strong> in the block you just completed? Click to choose.</p>
+  <p id="pairs-progress" class="small"></p>
+  <div style="display:flex;gap:40px;justify-content:center;margin:30px 0;align-items:center">
+    <div class="pair-box" onclick="pairChoice('left')" id="pair-left-box"><canvas width="220" height="220" id="pair-left-cv" style="width:110px;height:110px"></canvas></div>
+    <div style="font-size:1.5em;color:#999">or</div>
+    <div class="pair-box" onclick="pairChoice('right')" id="pair-right-box"><canvas width="220" height="220" id="pair-right-cv" style="width:110px;height:110px"></canvas></div>
+  </div>
+  <div id="pairs-conf-area" style="display:none;text-align:center;margin-top:20px">
+    <p>How confident are you in your choice?</p>
+    <div style="display:flex;align-items:center;gap:12px;justify-content:center;max-width:520px;margin:0 auto">
+      <span style="font-size:.95em;color:#666">Not very<br>confident</span>
+      <input type="range" min="1" max="10" value="5" step="1" id="conf-slider" style="flex:1;max-width:340px;opacity:0.35" oninput="this.style.opacity='1';this.dataset.touched='1'" onpointerdown="this.style.opacity='1';this.dataset.touched='1'">
+      <span style="font-size:.95em;color:#666">Very<br>confident</span>
+    </div>
+    <p class="err" id="pairs-conf-err"></p>
+    <button onclick="submitPairConf()">Next</button>
+  </div>
+</div>
+
+<!-- ================= QUESTIONNAIRES ================= -->
+<div class="screen" id="scr-q-intro">
+  <h1>Some questions about you</h1>
+  <p>That is the end of the task. Thank you.</p>
+  <p>Next there are <strong>four short questionnaires</strong> about your mood, worry, everyday habits, and how you tend to respond to uncertainty. They take about seven minutes in total.</p>
+  <p>There are no right or wrong answers. Please answer each question honestly, based on how you have actually been feeling. Your answers do not affect your score.</p>
+  <div class="note"><p style="margin:0">Some of these questions ask about difficult feelings. If you find this uncomfortable you can stop at any time. Details of free, confidential support are given at the end of the study.</p></div>
+  <button onclick="startQuestionnaires()">Continue</button>
+</div>
+
+<div class="screen" id="scr-q">
+  <h1 id="q-h1"></h1>
+  <p id="q-stem"></p>
+  <p id="q-progress" class="small"></p>
+  <div id="q-item" class="q-item"></div>
+  <div id="q-opts" class="q-opts"></div>
+  <button id="q-back" onclick="qBack()" style="background:#fff;color:#2a5a8a;border:1px solid #2a5a8a;padding:6px 18px;font-size:.9em;margin-top:26px">&larr; Back</button>
+</div>
+
+<!-- ================= DEMOGRAPHICS ================= -->
+<div class="screen" id="scr-demographics">
+  <h1>Demographics</h1>
+  <div class="form-row"><label>Age</label><input type="number" id="demo-age" min="16" max="99" style="max-width:120px"> <label style="font-weight:normal;display:inline;margin-left:12px"><input type="checkbox" id="demo-age-pnts" onchange="if(this.checked){document.getElementById('demo-age').value='';document.getElementById('demo-age').disabled=true;}else{document.getElementById('demo-age').disabled=false;}"> Prefer not to say</label></div>
+  <div class="form-row"><label>Gender</label><select id="demo-gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option></select></div>
+  <div class="form-row"><label>Is English your first language?</label><select id="demo-english"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
+  <div class="form-row"><label>Highest education completed</label><select id="demo-education"><option value="">Select…</option><option>GCSEs or equivalent</option><option>A-levels or equivalent</option><option>Undergraduate degree</option><option>Postgraduate degree</option><option>Doctoral degree</option><option>Other</option><option>Prefer not to say</option></select></div>
+  <p class="err" id="demo-err"></p>
+  <button onclick="submitDemographics()">Continue</button>
+</div>
+
+<div class="screen" id="scr-saving">
+  <h1>Saving your responses&hellip;</h1>
+  <p>Please wait a moment and <strong>do not close this window</strong>.</p>
+</div>
+
+<!-- ================= DEBRIEF ================= -->
+<div class="screen" id="scr-debrief">
+  <h1>Debriefing</h1>
+  <div id="save-fail" class="alert" style="display:none">
+    <p><strong>We could not save your data automatically.</strong> Please click the button below to download your data file, then email it to the research team at samuel.jones@bangor.ac.uk so that you can receive your credit.</p>
+    <button onclick="downloadLocal()">Download my data file</button>
+  </div>
+  <div id="item9-box" class="alert" style="display:none">
+    <p style="margin:0"><strong>Please look after yourself.</strong> One of your answers suggested you may have had thoughts that you would be better off dead, or of hurting yourself. Because your answers are anonymous we cannot contact you, so please consider talking to someone today. You can call the <strong>Student Wellbeing Helpline free on 0800 028 3766</strong> or <strong>Samaritans free on 116 123</strong> at any time, or text <strong>SHOUT to 85258</strong>. If you are in immediate danger, call <strong>999</strong>.</p>
+  </div>
+  <p>Thank you for completing this study. The total number of points you earned is <strong id="debrief-total"></strong>.</p>
+  <p>Below is a breakdown of points by block.</p>
+  <table style="border-collapse:collapse;margin:12px 0;max-width:400px"><thead><tr><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Block</th><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Points</th></tr></thead><tbody id="debrief-block-rows"></tbody></table>
+  <div class="credit-box"><p style="margin:0">Your responses have been saved. <strong>To receive your course credit, please read the information below and then click the credit button at the bottom of this page.</strong></p></div>
+  <p>Understanding agentic behaviour is at the frontier of cognitive neuroscience. This study investigated how people search for information and make decisions under uncertainty &mdash; for example, how much they check before committing, and how this changes when information is free or costly &mdash; and whether these patterns relate to everyday experiences of low mood, worry, anxiety and repetitive habits such as checking. The questionnaires you completed are widely used research measures; they are not a diagnosis.</p>
+
+  <div class="support">
+    <h2>Support</h2>
+    <p>If you found any of these questions upsetting or if they have raised concerns for you, we strongly encourage you to talk to someone you trust or to seek support. You may find the following sources of support helpful.</p>
+
+    <h3>If you need urgent help now</h3>
+    <ul>
+      <li>If you or someone else is in <strong>immediate danger</strong> or needs urgent medical attention: <strong>call 999</strong> or go to your nearest <strong>Accident &amp; Emergency (A&amp;E)</strong> department.</li>
+      <li>If you need urgent mental health support but it is not a life-threatening emergency: <strong>call NHS 111</strong> (choose option 2 for mental health). This is a 24-hour helpline staffed by mental health professionals who can advise you and help you access the right care.</li>
+      <li><strong>Student Wellbeing Helpline (Health Assured)</strong> &mdash; free 24/7 support for all Bangor University students, day or night: <strong>0800 028 3766</strong>.</li>
+      <li>More information: <a href="https://bangoroffice365.sharepoint.com/sites/Hub/SitePages/Urgent-Mental-Health-Help.aspx" target="_blank" rel="noopener">Urgent Mental Health Help</a> and a list of <a href="https://bangoroffice365.sharepoint.com/sites/Hub/SitePages/Recommended-Mental-Health-and-Wellbeing-Resources.aspx#24-7-helplines" target="_blank" rel="noopener">other 24/7 helplines</a> on the Bangor University Hub (university login required).</li>
+    </ul>
+
+    <h3>Bangor University Wellbeing Services</h3>
+    <ul>
+      <li>Email <a href="mailto:wellbeingservices@bangor.ac.uk">wellbeingservices@bangor.ac.uk</a> or phone <strong>01248 388520</strong>.</li>
+      <li><strong>Location:</strong> Neuadd Rathbone, College Road, Bangor, Gwynedd, LL57 2DG (<a href="https://www.bangor.ac.uk/campusmap#rathbone" target="_blank" rel="noopener">view on the campus map</a>; what3words: curry.recital.bulge).</li>
+      <li><strong>Opening hours:</strong> normally 09:00&ndash;17:00, Monday to Friday (appointment only in Neuadd Rathbone).</li>
+      <li><strong>Duty counsellor drop-in:</strong> Monday to Friday, 9.15am to 4.15pm, in the Hub.</li>
+      <li>The Wellbeing and Inclusivity Service is not an emergency or crisis service, but can help you access the right support and make a safety plan for the future. See <a href="https://bangoroffice365.sharepoint.com/sites/Hub/SitePages/Mental-Health-and-Wellbeing-Support-from-Wellbeing-and-Inclusivity-Service.aspx" target="_blank" rel="noopener">Support from the Wellbeing and Inclusivity Service</a>.</li>
+    </ul>
+
+    <h3>Your GP</h3>
+    <ul>
+      <li>For less urgent concerns, contact your GP for medical advice and support, including free NHS talking therapies. If you have not yet registered with a local GP while studying at Bangor, it is important to do so; Wellbeing Services are happy to help you register.</li>
+    </ul>
+
+    <h3>UK charities and helplines</h3>
+    <ul>
+      <li><strong>Samaritans</strong> &mdash; call <strong>116 123</strong> free, any time, day or night. Welsh language line: 0808 164 0123 (7pm&ndash;11pm every day). <a href="https://www.samaritans.org" target="_blank" rel="noopener">samaritans.org</a></li>
+      <li><strong>Shout</strong> &mdash; free, confidential 24/7 text support: text <strong>SHOUT</strong> to <strong>85258</strong>.</li>
+      <li><strong>CALL Mental Health Listening Line (Wales)</strong> &mdash; <strong>0800 132 737</strong>, 24/7, or text &ldquo;help&rdquo; to 81066. <a href="https://www.callhelpline.org.uk" target="_blank" rel="noopener">callhelpline.org.uk</a></li>
+      <li><strong>Student Minds</strong> &mdash; the UK&rsquo;s student mental health charity, with information and support for students. <a href="https://www.studentminds.org.uk" target="_blank" rel="noopener">studentminds.org.uk</a></li>
+      <li><strong>Mind</strong> &mdash; information and support for depression, anxiety and other mental health problems. Infoline 0300 123 3393. <a href="https://www.mind.org.uk" target="_blank" rel="noopener">mind.org.uk</a></li>
+      <li><strong>Anxiety UK</strong> &mdash; support for anxiety. Helpline <strong>03444 775 774</strong> or text 07537 416905 (Monday to Friday, 9.30am to 5.30pm). <a href="https://www.anxietyuk.org.uk" target="_blank" rel="noopener">anxietyuk.org.uk</a></li>
+      <li><strong>Hub of Hope</strong> &mdash; search for local mental health support near you. <a href="https://hubofhope.co.uk" target="_blank" rel="noopener">hubofhope.co.uk</a></li>
+    </ul>
+  </div>
+
+  <p>If you have any questions or concerns about this work, please contact project lead Dr Sam Jones via email at <a href="mailto:samuel.jones@bangor.ac.uk">samuel.jones@bangor.ac.uk</a>. Alternatively, please contact Bangor University's Senior Research Governance &amp; Policy Officer at <a href="mailto:seniorresearchgovofficer@bangor.ac.uk">seniorresearchgovofficer@bangor.ac.uk</a>.</p>
+  <div class="credit-box">
+    <p id="credit-auto" style="display:none;margin:0 0 10px">When you are ready, click the button below to confirm that you have finished. This grants your SONA credit.</p>
+    <a id="credit-btn" href="#" style="display:none"><button>Receive my SONA credit</button></a>
+    <p id="credit-manual" style="margin:0">Your participation has been recorded. Your credit will be granted in SONA by the research team.</p>
+  </div>
+  <p>Thank you once again.</p>
+</div>
+
+</div>
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const CONFIG={
+  practiceCosts:[0,0],      // both practice trials free (question marks, ascending variance); click costs are introduced before the costly blocks
+  trialsPerBlock:10,
+  // Non-symbolic blocks: ascending variance, identical to the original task's 'increasing' condition: reward SD 3 / 6 / 12 at depth 1 / 2 / 3.
+  depthSD:{1:3,2:6,3:12},
+  // Symbolic blocks (as in the original task): CONSTANT variance. Each symbol has one fixed value wherever it appears.
+  symMeans:[8,3,-3,-8],
+  symSD:2,
+  // Pruning test (Huys et al., 2012): planted boards in BOTH symbol blocks where the best route (at zero cost)
+  // starts with the -8 symbol followed by +8, +8. Free block: walking through the loss is optimal.
+  // Costly block: the identical kind of board, where avoiding the loss is optimal (3 clicks x 5 points).
+  plantedTrials:4,          // per symbol block
+  plantedAfter:3,           // the first 3 trials of each symbol block are always ordinary (symbol learning)
+  plantMargin:5,            // loss route must beat every other route by at least this many expected points (at zero cost)
+  costlyClickCost:2,        // points per click in the costly blocks (chosen by simulation: at 2, searching one or two branches is worthwhile; at 3+ it never pays in the question-mark blocks)
+  counterbalanceCostOrder:false, // false = fixed order (free then costly within each pair). true = random per participant.
+  newSymbolsForCost5:true,  // true: block 4 uses a fresh symbol set (so the cost effect isn't carried by prior learning)
+  includePHQ9Item9:false,   // PHQ-8 by default. If true, item 9 is asked and endorsers see a support box.
+  strategyReflection:true,
+  qMinItemMs:800,           // questionnaire answer buttons are inactive for this long after each item appears
+  dataPipeId:'5HYh2n8mS8O8',          // DataPipe experiment ID (DataPipe saves the files to the Google Drive linked to this experiment)
+  // SONA: set the study URL in SONA to  ...task.html?id=%SURVEY_CODE%
+  // and paste SONA's client-side completion URL here (it ends in survey_code=XXXX; leave XXXX in place):
+  sonaCreditUrl:'',                   // e.g. 'https://YOURSCHOOL.sona-systems.com/webstudy_credit.aspx?experiment_id=123&credit_token=abc...&survey_code=XXXX'
+  studyTag:'tree_psych'
+};
+
+/* ============================================================
+   GRAPH (unchanged from original)
+   ============================================================ */
+const GRAPH={children:{0:[1,5,9,13],1:[2],5:[6],9:[10],13:[14],2:[3,4],6:[7,8],10:[11,12],14:[15,16],3:[],4:[],7:[],8:[],11:[],12:[],15:[],16:[]},parent:{0:null,1:0,5:0,9:0,13:0,2:1,6:5,10:9,14:13,3:2,4:2,7:6,8:6,11:10,12:10,15:14,16:14},depth:{0:0,1:1,5:1,9:1,13:1,2:2,6:2,10:2,14:2,3:3,4:3,7:3,8:3,11:3,12:3,15:3,16:3},pos:{0:[350,250],1:[350,170],2:[350,90],3:[280,30],4:[420,30],5:[430,250],6:[510,250],7:[570,180],8:[570,320],9:[350,330],10:[350,410],11:[280,470],12:[420,470],13:[270,250],14:[190,250],15:[130,180],16:[130,320]},arrowMap:{0:{ArrowUp:1,ArrowRight:5,ArrowDown:9,ArrowLeft:13},1:{ArrowUp:2},2:{ArrowLeft:3,ArrowRight:4},5:{ArrowRight:6},6:{ArrowUp:7,ArrowDown:8},9:{ArrowDown:10},10:{ArrowLeft:11,ArrowRight:12},13:{ArrowLeft:14},14:{ArrowUp:15,ArrowDown:16}},nodeCount:17,terminals:[3,4,7,8,11,12,15,16],paths:[[0,1,2,3],[0,1,2,4],[0,5,6,7],[0,5,6,8],[0,9,10,11],[0,9,10,12],[0,13,14,15],[0,13,14,16]],d1:[1,5,9,13]};
+
+const SYM_B=['λ','Ψ','Π','Φ'];
+const SYM_C=['✕','○','□','△'];
+const SYM_SAFE={'λ':'lambda','Ψ':'psi','Π':'pi','Φ':'phi','✕':'cross','○':'circle','□':'square','△':'triangle','?':'?'};
+const symName=s=>SYM_SAFE[s]||s;
+
+/* ============================================================
+   STATE & HELPERS
+   ============================================================ */
+function ts(){return Date.now()}
+const STATE={participantId:'',consentTimestamp:'',quizAttempts:0,globalTrialNum:0,currentBlockIdx:-1,currentTrialInBlock:0,
+  isPractice:false,trial:null,blockDefs:[],events:[],strategyComments:[],valEstData:[],pairedChoiceData:[],
+  cb:{},blockCCErrors:{},blockCCAttempts:{},blockRatings:[],qOrder:[],qi:0,q:{},demographics:{},totalScore:0,blockScores:{},item9Flag:false,
+  studyT0:ts(),csv:'',filename:'',sonaFromUrl:false};
+function readSonaId(){
+  const P=new URLSearchParams(window.location.search||'');
+  const id=(P.get('id')||P.get('survey_code')||'').trim();
+  if(id&&id!=='%SURVEY_CODE%'){
+    document.getElementById('inp-pid').value=id;STATE.sonaFromUrl=true;
+    document.getElementById('pid-row').style.display='none';
+    document.getElementById('pid-ask').style.display='none';document.getElementById('pid-auto').style.display='';
+  }
+}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0)}
+function randInt(n){return Math.floor(Math.random()*n)}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=randInt(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+function gaussRand(m,s){const u=1-Math.random(),v=Math.random();return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}  // u in (0,1]: no log(0)
+function gaussInt(m,s){return Math.round(gaussRand(m,s))}
+function fmtV(v){return (v>0?'+':'')+v}
+function costText(c){return c===0?'free':c+' point'+(c===1?'':'s')}
+
+function drawSymbol(cx,sym,x,y,r,col){
+  cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=2.2;cx.lineCap='round';cx.lineJoin='round';
+  if(sym==='△'){cx.beginPath();cx.moveTo(x,y-r);cx.lineTo(x-r*.87,y+r*.5);cx.lineTo(x+r*.87,y+r*.5);cx.closePath();cx.stroke();}
+  else if(sym==='○'){cx.beginPath();cx.arc(x,y,r*.75,0,Math.PI*2);cx.stroke();}
+  else if(sym==='□'){const s=r*.7;cx.strokeRect(x-s,y-s,s*2,s*2);}
+  else if(sym==='✕'){const s=r*.6;cx.beginPath();cx.moveTo(x-s,y-s);cx.lineTo(x+s,y+s);cx.stroke();cx.beginPath();cx.moveTo(x+s,y-s);cx.lineTo(x-s,y+s);cx.stroke();}
+  else{cx.font=`bold ${r*1.8}px Georgia`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(sym,x,y);}
+}
+
+/* ============================================================
+   SETUP (block order is fixed, as specified)
+   ============================================================ */
+function makePlan(n){
+  const k=Math.min(CONFIG.plantedTrials,Math.max(0,n-CONFIG.plantedAfter));
+  const rest=shuffle(Array(k).fill('planted').concat(Array(n-CONFIG.plantedAfter-k).fill('standard')));
+  return Array(Math.min(CONFIG.plantedAfter,n)).fill('standard').concat(rest);
+}
+function submitPid(){
+  const pid=document.getElementById('inp-pid').value.trim();
+  if(!pid){document.getElementById('pid-err').textContent='Please enter your SONA participant ID.';return;}
+  STATE.participantId=pid;
+  // counterbalanced: which symbol set appears first, and which symbol has which value
+  const first=Math.random()<.5?'B':'C',second=first==='B'?'C':'B',SETS={B:SYM_B,C:SYM_C};
+  const mapFor=syms=>{const s=shuffle(syms),m={};s.forEach((sy,i)=>{m[sy]=CONFIG.symMeans[i]});return m};
+  const sym0={set:first,symbols:SETS[first],means:mapFor(SETS[first])};
+  const sym5=CONFIG.newSymbolsForCost5?{set:second,symbols:SETS[second],means:mapFor(SETS[second])}:sym0;
+  const mk=(id,cue,cost,sy)=>({id,cueMode:cue,variance:cue==='symbolic'?'constant':'increasing',clickCost:cost,trials:CONFIG.trialsPerBlock,
+    symbols:sy?sy.symbols:null,symbolSet:sy?sy.set:'',means:sy?sy.means:null});
+  const C=CONFIG.costlyClickCost,costlyFirst=CONFIG.counterbalanceCostOrder&&Math.random()<.5;
+  const nsPair=[mk('ns_free','none',0),mk('ns_costly','none',C)],syPair=[mk('sym_free','symbolic',0,sym0),mk('sym_costly','symbolic',C,sym5)];
+  if(costlyFirst){nsPair.reverse();syPair.reverse();}
+  STATE.blockDefs=nsPair.concat(syPair);
+  STATE.blockDefs.forEach(bd=>{bd.plan=bd.cueMode==='symbolic'?makePlan(bd.trials):Array(bd.trials).fill('standard');});
+  STATE.qOrder=shuffle(['phq','gad','ius','oci']);
+  const mapStr=sy=>sy.symbols.map(s=>symName(s)+'@'+sy.means[s]).join('|');
+  STATE.cb={block_order:STATE.blockDefs.map(b=>b.id).join('>'),cost_order:costlyFirst?'costly_first':'free_first',costly_click_cost:C,
+    trial_plan_sym_free:STATE.blockDefs.find(b=>b.id==='sym_free').plan.join('|'),trial_plan_sym_costly:STATE.blockDefs.find(b=>b.id==='sym_costly').plan.join('|'),
+    symbol_set_sym_free:sym0.set,symbol_set_sym_costly:sym5.set,
+    symbol_values_sym_free:mapStr(sym0),symbol_values_sym_costly:mapStr(sym5),questionnaire_order:STATE.qOrder.join('>')};
+  showScreen('scr-info');
+}
+function submitConsent(){
+  if(!['c1','c2','c3','c4','c5','c6'].every(i=>document.getElementById(i).checked)||!document.getElementById('inp-sig').value.trim()){
+    document.getElementById('consent-err').textContent='Please tick all boxes and provide your initials if you would like to continue.';return;}
+  STATE.consentTimestamp=new Date().toISOString();
+  sendConsent();
+  showScreen('scr-instructions');
+}
+function sendConsent(){
+  const sig=document.getElementById('inp-sig').value.trim().replace(/[,\n"]/g,' ');
+  const csv=['field,value','sona_id,'+STATE.participantId,'consent_timestamp,'+STATE.consentTimestamp,
+    'c1_read_information_sheet,Yes','c2_voluntary_participation,Yes','c3_data_anonymised_gdpr,Yes',
+    'c4_open_access_sharing,Yes','c6_mood_questions_understood,Yes','c5_agree_to_take_part,Yes','digital_signature,'+sig].join('\n');
+  sendToPipe(CONFIG.studyTag+'_p'+STATE.participantId+'_consent.csv',csv).catch(()=>{});
+}
+function submitQuiz(){
+  STATE.quizAttempts++;
+  const ans={q1:'c',q2:'c',q3:'a',q4:'c',q5:'a',q6:'c'};let pass=true;
+  for(const[n,a]of Object.entries(ans)){const s=document.querySelector('input[name="'+n+'"]:checked');if(!s||s.value!==a)pass=false;}
+  if(pass){document.getElementById('quiz-err').textContent='';advanceToNextBlock();}
+  else document.getElementById('quiz-err').textContent='Not quite — please check your answers and try again.';
+}
+
+/* ============================================================
+   BOARDS
+   ============================================================ */
+function symMean(bd,sym){return bd.means[sym]}
+function nodeMean(bd,cues,n){return bd.cueMode==='symbolic'?symMean(bd,cues[n]):0}
+/* Expected net value of each executable plan given the symbols and the click cost.
+   A plan = a route prefix of depth 1-3 (revealing exactly those nodes), or one click then stay at the start. */
+function expOptions(bd,cues){
+  const c=bd.clickCost,opts=[{route:[0],gross:0,net:-c}],seen={};
+  GRAPH.paths.forEach(p=>{for(let d=1;d<=3;d++){const r=p.slice(0,d+1),k=r.join('|');if(seen[k])continue;seen[k]=1;
+    let g=0;for(let i=1;i<r.length;i++)g+=nodeMean(bd,cues,r[i]);opts.push({route:r,gross:g,net:g-c*d});}});
+  opts.sort((a,b)=>b.net-a.net||b.route.length-a.route.length);return opts;
+}
+function symWith(bd,v){return bd.symbols.find(s=>bd.means[s]===v)}
+function inSubtree(n,root){while(n!==null&&n!==undefined){if(n===root)return true;n=GRAPH.parent[n];}return false}
+/* Planted board: loss symbol (-8) next to the start, +8 behind it, +8 on one leaf; every other route is worse by >= plantMargin (zero cost). */
+function plantedCues(bd){
+  const L=symWith(bd,-8),Hi=symWith(bd,8),mid=bd.symbols.filter(s=>s!==L&&s!==Hi),notHi=bd.symbols.filter(s=>s!==Hi);
+  const free=Object.assign({},bd,{clickCost:0});
+  for(let tries=1;tries<=20000;tries++){
+    const c={0:''},lossNode=GRAPH.d1[randInt(4)];
+    for(let n=1;n<GRAPH.nodeCount;n++)c[n]=bd.symbols[randInt(bd.symbols.length)];
+    const others=[0,1,2].map(()=>mid[randInt(mid.length)]);   // +3 / -3 next to the start on the other branches
+    GRAPH.d1.filter(n=>n!==lossNode).forEach((n,i)=>{c[n]=others[i]});
+    c[lossNode]=L;const m=GRAPH.children[lossNode][0];c[m]=Hi;
+    const lv=shuffle(GRAPH.children[m]);c[lv[0]]=Hi;c[lv[1]]=notHi[randInt(notHi.length)];
+    const o=expOptions(free,c);
+    if(o[0].route.length===4&&o[0].route[1]===lossNode&&o[0].net-o[1].net>=CONFIG.plantMargin)return {cues:c,lossNode,tries};
+  }
+  return null;
+}
+function newTrial(bd,trialNum,globalNum,isPractice,type){
+  let cues={0:''},rewards={0:0},lossNode=null,planted=type==='planted',plantTries='';
+  if(bd.cueMode==='symbolic'){
+    const pc=planted?plantedCues(bd):null;
+    if(pc){cues=pc.cues;lossNode=pc.lossNode;plantTries=pc.tries;}
+    else{
+      if(planted)planted=false;   // fallback (never expected): ordinary board, flagged in the data
+      const d1=shuffle(bd.symbols);GRAPH.d1.forEach((n,i)=>{cues[n]=d1[i]});   // each symbol once at depth 1 (as original)
+      for(let n=1;n<GRAPH.nodeCount;n++){if(cues[n]===undefined)cues[n]=bd.symbols[randInt(bd.symbols.length)];}
+    }
+    for(let n=1;n<GRAPH.nodeCount;n++)rewards[n]=gaussInt(symMean(bd,cues[n]),CONFIG.symSD);
+  }else{
+    for(let n=1;n<GRAPH.nodeCount;n++){cues[n]='?';rewards[n]=gaussInt(0,CONFIG.depthSD[GRAPH.depth[n]]);}
+  }
+  const opts=bd.cueMode==='symbolic'?expOptions(bd,cues):null;
+  return {bd,blockId:bd.id,trialNum,globalNum,isPractice,rewards,cues,
+    trialType:isPractice?'practice':(planted?'planted':'standard'),plantRequested:type==='planted'?1:0,plantTries,lossNode,
+    expBest:opts?opts[0]:null,expSecond:opts?opts[1]:null,
+    revealed:{0:true},clicks:[],clickTimestamps:[],phase:'search',currentNode:0,route:[0],moveTimestamps:[],
+    trialStartTime:ts(),executeTime:null,score:null};
+}
+
+/* ============================================================
+   TRIAL MECHANICS
+   ============================================================ */
+function computePathValues(t){return GRAPH.paths.map(p=>{let v=0;for(let i=1;i<p.length;i++)v+=t.rewards[p[i]];return v})}
+function computeOptimalDepth(r,depth){let b=-Infinity,bp=null;GRAPH.paths.forEach(p=>{const sub=p.slice(0,depth+1);let v=0;for(let i=1;i<sub.length;i++)v+=r[sub[i]];if(v>b){b=v;bp=sub;}});return{score:b,path:bp}}
+function canExecute(t){for(let n=1;n<GRAPH.nodeCount;n++)if(t.revealed[n])return true;return false}
+function getFrontier(t){if(t.phase!=='search')return[];const f=[];for(let n=0;n<GRAPH.nodeCount;n++){if(t.revealed[n])continue;if(GRAPH.parent[n]!==null&&t.revealed[GRAPH.parent[n]])f.push(n);}return f}
+
+function recordEvent(phase,evType,nid,trial,extra){
+  const bd=trial.bd;
+  const pv=computePathValues(trial);const sorted=pv.slice().sort((a,b)=>b-a);const frontier=getFrontier(trial);
+  const bestIdx=pv.indexOf(Math.max(...pv));let onBest='';if(nid!==null&&evType==='click')onBest=GRAPH.paths[bestIdx].includes(nid)?1:0;
+  const sr=[],sc=[];for(let n=0;n<GRAPH.nodeCount;n++){sr.push(trial.rewards[n]);sc.push(trial.cues[n]||'');}
+  const hasNode=nid!==null&&nid!==0;
+  const row={sona_id:STATE.participantId,block_id:bd.id,block_number:trial.isPractice?0:STATE.currentBlockIdx+1,
+    block_cue_mode:bd.cueMode,block_variance:bd.variance,block_symbol_set:bd.symbolSet,block_click_cost:bd.clickCost,
+    trial_in_block:trial.trialNum,trial_global:trial.globalNum,is_practice:trial.isPractice?1:0,
+    trial_type:trial.trialType,loss_node:trial.lossNode===null?'':trial.lossNode,
+    node_in_loss_subtree:(hasNode&&trial.lossNode!==null)?(inSubtree(nid,trial.lossNode)?1:0):'',
+    phase,event_type:evType,event_timestamp_ms:ts(),event_time_in_trial_ms:ts()-trial.trialStartTime,
+    node_id:nid!==null?nid:'',node_depth:nid!==null?GRAPH.depth[nid]:'',node_value:(nid!==null&&trial.revealed[nid])?trial.rewards[nid]:'',
+    node_cue:hasNode?symName(trial.cues[nid]):'',
+    node_cue_mean:(hasNode&&bd.cueMode==='symbolic')?symMean(bd,trial.cues[nid]):'',
+    node_on_exp_best_route:(hasNode&&trial.expBest)?(trial.expBest.route.includes(nid)?1:0):'',
+    click_number:trial.clicks.length,frontier_nodes:frontier.join('|'),frontier_size:frontier.length,n_revealed:Object.keys(trial.revealed).length,
+    is_on_best_path:onBest,path_values:pv.join('|'),best_path_value:sorted[0],state_rewards:sr.join('|'),state_cues:sc.map(s=>s?symName(s):'').join('|')};
+  Object.assign(row,extra||{});STATE.events.push(row);
+}
+
+const canvas=document.getElementById('task-canvas'),ctx=canvas.getContext('2d'),NR=22,CW=700,CH=500;   // logical drawing size; canvas pixels are 2x for sharpness
+/* Size the tree to the window: as large as fits (up to 1.25x the original 700x500), never smaller than the original. */
+function sizeCanvas(){
+  if(!document.getElementById('scr-task').classList.contains('active'))return;
+  const top=canvas.getBoundingClientRect().top+(window.scrollY||0);
+  const availH=(window.innerHeight||900)-top-80;                     // leave room for the Execute / Stop button
+  const availW=canvas.parentElement.clientWidth||CW;
+  const w=Math.round(Math.max(CW,Math.min(875,availW,availH*CW/CH)));
+  canvas.style.width=w+'px';canvas.style.height=Math.round(w*CH/CW)+'px';
+}
+window.addEventListener('resize',sizeCanvas);
+function drawTrial(trial){
+  ctx.setTransform(canvas.width/CW,0,0,canvas.height/CH,0,0);ctx.clearRect(0,0,CW,CH);const frontier=getFrontier(trial);
+  for(const[p,kids]of Object.entries(GRAPH.children))for(const k of kids){const[x1,y1]=GRAPH.pos[p],[x2,y2]=GRAPH.pos[k];const dx=x2-x1,dy=y2-y1,l=Math.sqrt(dx*dx+dy*dy),ux=dx/l,uy=dy/l;const sx=x1+ux*NR,sy=y1+uy*NR,ex=x2-ux*NR,ey=y2-uy*NR;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.strokeStyle='#aaa';ctx.lineWidth=1.5;ctx.stroke();const h=8,a=Math.atan2(ey-sy,ex-sx);ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex-h*Math.cos(a-.4),ey-h*Math.sin(a-.4));ctx.lineTo(ex-h*Math.cos(a+.4),ey-h*Math.sin(a+.4));ctx.closePath();ctx.fillStyle='#aaa';ctx.fill();}
+  for(let n=0;n<GRAPH.nodeCount;n++){
+    const[x,y]=GRAPH.pos[n];const rev=trial.revealed[n],click=frontier.includes(n),cur=(trial.phase==='execute'&&trial.currentNode===n),onR=(trial.phase==='done'&&trial.route.includes(n));
+    ctx.beginPath();ctx.arc(x,y,NR,0,Math.PI*2);
+    if(cur)ctx.fillStyle='#2ecc71';else if(onR)ctx.fillStyle='#aed6f1';else if(n===0)ctx.fillStyle='#a9cce3';
+    else if(rev)ctx.fillStyle='#e8f5e9';
+    else if(click&&trial.phase==='search')ctx.fillStyle='#fdebd0';else ctx.fillStyle='#e8e8e8';
+    ctx.fill();
+    if(cur){ctx.strokeStyle='#111';ctx.lineWidth=3;}
+    else{ctx.strokeStyle=(click&&trial.phase==='search')?'#e67e22':'#888';ctx.lineWidth=(click&&trial.phase==='search')?2.5:1.5;}
+    ctx.stroke();
+    if(n===0){ctx.fillStyle='#1a5276';ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();}
+    else if(rev){const v=trial.rewards[n];ctx.font='bold 14px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#222';ctx.fillText(fmtV(v),x,y);}
+    else{drawSymbol(ctx,trial.cues[n],x,y,13,(click&&trial.phase==='search')?'#8B4513':'#888');}
+  }
+  if(trial.phase==='execute'){const moves=GRAPH.arrowMap[trial.currentNode];if(moves)for(const[d,t]of Object.entries(moves)){if(!trial.revealed[t])continue;const[tx,ty]=GRAPH.pos[t],[cx2,cy2]=GRAPH.pos[trial.currentNode];const mx=(cx2+tx)/2,my=(cy2+ty)/2,sz=7;ctx.beginPath();if(d==='ArrowUp'){ctx.moveTo(mx,my-sz);ctx.lineTo(mx-sz,my+sz);ctx.lineTo(mx+sz,my+sz);}else if(d==='ArrowDown'){ctx.moveTo(mx,my+sz);ctx.lineTo(mx-sz,my-sz);ctx.lineTo(mx+sz,my-sz);}else if(d==='ArrowLeft'){ctx.moveTo(mx-sz,my);ctx.lineTo(mx+sz,my-sz);ctx.lineTo(mx+sz,my+sz);}else{ctx.moveTo(mx+sz,my);ctx.lineTo(mx-sz,my-sz);ctx.lineTo(mx-sz,my+sz);}ctx.closePath();ctx.fillStyle='#2a5a8a';ctx.fill();}}
+}
+
+canvas.addEventListener('click',function(e){
+  const t=STATE.trial;if(!t||t.phase!=='search')return;
+  const rect=canvas.getBoundingClientRect(),mx=(e.clientX-rect.left)*(CW/rect.width),my=(e.clientY-rect.top)*(CH/rect.height);
+  for(const nid of getFrontier(t)){const[nx,ny]=GRAPH.pos[nid];if(Math.sqrt((mx-nx)**2+(my-ny)**2)<=NR+4){revealNode(t,nid);return;}}
+});
+function revealNode(t,nid){
+  t.revealed[nid]=true;t.clicks.push(nid);t.clickTimestamps.push(ts());
+  recordEvent('search','click',nid,t,{});
+  document.getElementById('btn-execute').style.display=canExecute(t)?'inline-block':'none';
+  updateCostBox(t,true);
+  drawTrial(t);updateStatus();
+}
+function updateCostBox(t,flash){
+  const box=document.getElementById('task-cost-box');
+  if(!t||t.bd.clickCost===0){box.style.display='none';return;}
+  box.style.display='inline-block';
+  box.textContent='Click cost this trial: \u2212'+(t.clicks.length*t.bd.clickCost);
+  if(flash){box.classList.remove('flash');void box.offsetWidth;box.classList.add('flash');}
+}
+function stopHere(){
+  const t=STATE.trial;if(!t||t.phase!=='execute')return;
+  recordEvent('execute','stop_here',t.currentNode,t,{stop_method:'button'});endTrial();
+}
+function executePhase(){
+  const t=STATE.trial;if(!t||t.phase!=='search'||!canExecute(t))return;
+  t.phase='execute';t.executeTime=ts();
+  recordEvent('search','stop',null,t,{});
+  const b=document.getElementById('btn-execute');b.style.display='none';b.blur();
+  document.getElementById('btn-stop').style.display='inline-block';
+  drawTrial(t);updateStatus();
+}
+document.addEventListener('keydown',function(e){
+  const t=STATE.trial;if(!t||t.phase!=='execute')return;
+  if(e.key===' '||e.key==='Spacebar'){e.preventDefault();recordEvent('execute','stop_here',t.currentNode,t,{stop_method:'spacebar'});endTrial();return;}
+  const moves=GRAPH.arrowMap[t.currentNode];if(!moves||moves[e.key]===undefined)return;
+  e.preventDefault();const target=moves[e.key];if(!t.revealed[target])return;
+  t.currentNode=target;t.route.push(target);t.moveTimestamps.push(ts());recordEvent('execute','move',target,t,{});
+  const hasRevChild=GRAPH.children[target]&&GRAPH.children[target].some(c=>t.revealed[c]);
+  if(GRAPH.terminals.includes(target)||!hasRevChild)endTrial();else{drawTrial(t);updateStatus();}
+});
+
+function endTrial(){
+  const t=STATE.trial;if(t.phase==='done')return;t.phase='done';
+  document.getElementById('btn-stop').style.display='none';
+  const bd=t.bd,cost=bd.clickCost;
+  let pathReward=0;for(let i=1;i<t.route.length;i++)pathReward+=t.rewards[t.route[i]];
+  const cc=t.clicks.length*cost;t.score=pathReward-cc;
+  if(!t.isPractice){STATE.totalScore+=t.score;STATE.blockScores[bd.id]=(STATE.blockScores[bd.id]||0)+t.score;}
+  const od1=computeOptimalDepth(t.rewards,1),od2=computeOptimalDepth(t.rewards,2),od3=computeOptimalDepth(t.rewards,3);
+  const sb=GRAPH.d1.filter(n=>t.revealed[n]).length;const md=Math.max(...t.clicks.map(n=>GRAPH.depth[n]),0);
+  // --- derived search measures ---
+  const routeNodes=t.route.slice(1);
+  const onRoute=t.clicks.filter(n=>routeNodes.includes(n)).length;
+  const lastRouteClick=routeNodes.length?Math.max(...routeNodes.map(n=>t.clicks.indexOf(n))):-1;
+  const rv=routeNodes.map(n=>t.rewards[n]);
+  const rvMean=rv.length?rv.reduce((a,b)=>a+b,0)/rv.length:0;
+  const routeSD=rv.length>1?Math.sqrt(rv.reduce((a,b)=>a+(b-rvMean)**2,0)/(rv.length-1)):'';
+  const byDepth=d=>t.clicks.filter(n=>GRAPH.depth[n]===d).length;
+  const firstDepth=t.clicks.length?GRAPH.depth[t.clicks[0]]:'';
+  const extra={route:t.route.join('|'),route_values:t.route.map(n=>t.rewards[n]).join('|'),path_reward:pathReward,click_cost:cc,trial_score:t.score,
+    n_clicks:t.clicks.length,n_clicks_d1:byDepth(1),n_clicks_d2:byDepth(2),n_clicks_d3:byDepth(3),
+    prop_nodes_revealed:Math.round(t.clicks.length/16*1000)/1000,
+    n_clicks_on_route:onRoute,n_clicks_off_route:t.clicks.length-onRoute,
+    n_clicks_after_route_revealed:routeNodes.length?(t.clicks.length-1-lastRouteClick):'',
+    route_value_sd:routeSD===''?'':Math.round(routeSD*100)/100,
+    route_depth:t.route.length-1,search_breadth:sb,max_search_depth:md,
+    first_click_depth:firstDepth,
+    first_click_latency_ms:t.clickTimestamps.length?t.clickTimestamps[0]-t.trialStartTime:'',
+    search_duration_ms:t.executeTime?t.executeTime-t.trialStartTime:'',
+    trial_duration_ms:ts()-t.trialStartTime,all_clicks:t.clicks.join('|'),
+    optimal_d1_path:od1.path.join('|'),optimal_d1_values:od1.path.map(n=>t.rewards[n]).join('|'),optimal_d1_reward:od1.score,optimal_d1_net:od1.score-1*cost,
+    optimal_d2_path:od2.path.join('|'),optimal_d2_values:od2.path.map(n=>t.rewards[n]).join('|'),optimal_d2_reward:od2.score,optimal_d2_net:od2.score-2*cost,
+    optimal_d3_path:od3.path.join('|'),optimal_d3_values:od3.path.map(n=>t.rewards[n]).join('|'),optimal_d3_reward:od3.score,optimal_d3_net:od3.score-3*cost,
+    symbol_clicks:JSON.stringify(t.clicks.reduce((o,n)=>{const k=symName(t.cues[n]);o[k]=(o[k]||0)+1;return o},{}))};
+  if(t.expBest){   // symbolic blocks: compare behaviour with the expected-value-optimal plan given the symbols
+    const routeExpGross=routeNodes.reduce((a,n)=>a+nodeMean(bd,t.cues,n),0);
+    const expNetGivenClicks=routeExpGross-cost*t.clicks.length;
+    Object.assign(extra,{
+      exp_best_route:t.expBest.route.join('|'),exp_best_net:t.expBest.net,exp_second_net:t.expSecond.net,
+      exp_margin:t.expBest.net-t.expSecond.net,
+      chose_exp_best_route:t.route.join('|')===t.expBest.route.join('|')?1:0,
+      route_exp_gross:routeExpGross,route_exp_net_given_clicks:expNetGivenClicks,
+      exp_shortfall:t.expBest.net-expNetGivenClicks,
+      excess_clicks:t.clicks.length-Math.max(1,t.expBest.route.length-1)});
+  }
+  if(t.lossNode!==null){   // planted trials: pruning measures
+    const L=t.lossNode,m=GRAPH.children[L][0],lossRoute=[0,L,m].concat(GRAPH.children[m]);
+    const lossGross=nodeMean(bd,t.cues,L)+nodeMean(bd,t.cues,m)+Math.max(...GRAPH.children[m].map(n=>nodeMean(bd,t.cues,n)));
+    const free=Object.assign({},bd,{clickCost:0}),fo=expOptions(free,t.cues),bestAlt=fo.find(o=>o.route[1]!==L);
+    // best route on the values actually revealed at the moment of execution (only fully revealed routes/prefixes count)
+    let revBest=-Infinity,revBestThroughLoss=0;
+    GRAPH.paths.forEach(pth=>{for(let d=1;d<=3;d++){const r=pth.slice(0,d+1);if(!r.slice(1).every(n=>t.revealed[n]))break;
+      const v=r.slice(1).reduce((a,n)=>a+t.rewards[n],0);if(v>revBest){revBest=v;revBestThroughLoss=r[1]===L?1:0;}}});
+    Object.assign(extra,{
+      loss_route_exp_gross:lossGross,best_alt_exp_gross:bestAlt?bestAlt.gross:'',
+      loss_route_optimal_at_block_cost:t.expBest&&t.expBest.route[1]===L?1:0,
+      loss_node_revealed:t.revealed[L]?1:0,
+      loss_subtree_expanded:(t.revealed[m])?1:0,
+      n_clicks_in_loss_subtree:t.clicks.filter(n=>inSubtree(n,L)&&n!==L).length,
+      route_through_loss:t.route.includes(L)?1:0,
+      route_reached_loss_leaf:t.route.length===4&&t.route[1]===L?1:0,
+      revealed_best_through_loss:revBest===-Infinity?'':revBestThroughLoss,
+      plant_tries:t.plantTries});
+  }
+  if(t.plantRequested&&t.lossNode===null)extra.plant_failed=1;
+  recordEvent('terminate','end_trial',null,t,extra);
+  drawTrial(t);
+  document.getElementById('task-status').innerHTML='<span class="phase-label phase-done">Trial complete</span> '+(cost>0?'Path: '+fmtV(pathReward)+' − '+cc+' click cost = <strong>'+fmtV(t.score)+'</strong>':'Path total: <strong>'+fmtV(t.score)+'</strong>');
+  if(!t.isPractice){document.getElementById('task-score-box').style.display='inline-block';document.getElementById('task-score-box').textContent='Score: '+(STATE.blockScores[bd.id]||0);}
+  setTimeout(nextTrial,2000);
+}
+function updateStatus(){
+  const t=STATE.trial,el=document.getElementById('task-status'),cost=t.bd.clickCost;
+  if(t.phase==='search')el.innerHTML='<span class="phase-label phase-plan">Search</span> Click locations to reveal their values'+(cost>0?' (<strong>each click costs '+cost+' points</strong>)':'')+'. Clicks: '+t.clicks.length;
+  else if(t.phase==='execute')el.innerHTML='<span class="phase-label phase-act">Execute</span> Use <strong>arrow keys</strong> to navigate. Click <strong>Stop here</strong> (or press the spacebar) if you would like to stop at your current location.';
+}
+
+/* ============================================================
+   FLOW
+   ============================================================ */
+function startPractice(){STATE.isPractice=true;STATE.currentTrialInBlock=0;nextTrial();}
+function nextTrial(){
+  let bd;
+  if(STATE.isPractice){
+    STATE.currentTrialInBlock++;
+    if(STATE.currentTrialInBlock>CONFIG.practiceCosts.length){STATE.isPractice=false;STATE.trial=null;showScreen('scr-quiz');return;}
+    const c=CONFIG.practiceCosts[STATE.currentTrialInBlock-1];
+    bd={id:'practice',cueMode:'none',variance:'increasing',clickCost:c,symbols:null,symbolSet:'',means:null};
+    STATE.globalTrialNum++;
+    STATE.trial=newTrial(bd,STATE.currentTrialInBlock,STATE.globalTrialNum,true,'practice');
+    document.getElementById('task-block-label').textContent='Practice '+STATE.currentTrialInBlock+'/'+CONFIG.practiceCosts.length+(c>0?' — each click costs '+c+' points':'');
+    document.getElementById('task-score-box').style.display='none';
+  }else{
+    bd=STATE.blockDefs[STATE.currentBlockIdx];
+    STATE.currentTrialInBlock++;
+    if(STATE.currentTrialInBlock>bd.trials){STATE.trial=null;afterBlock();return;}
+    STATE.globalTrialNum++;
+    STATE.trial=newTrial(bd,STATE.currentTrialInBlock,STATE.globalTrialNum,false,bd.plan[STATE.currentTrialInBlock-1]);
+    document.getElementById('task-block-label').textContent='Block '+(STATE.currentBlockIdx+1)+' of '+STATE.blockDefs.length+' — Trial '+STATE.currentTrialInBlock+'/'+bd.trials+(bd.clickCost>0?' — each click costs '+bd.clickCost+' points':'');
+    document.getElementById('task-score-box').style.display='inline-block';
+    document.getElementById('task-score-box').textContent='Score: '+(STATE.blockScores[bd.id]||0);
+  }
+  showScreen('scr-task');document.getElementById('btn-execute').style.display='none';document.getElementById('btn-stop').style.display='none';
+  updateCostBox(STATE.trial,false);
+  drawTrial(STATE.trial);updateStatus();sizeCanvas();
+}
+function advanceToNextBlock(){
+  STATE.currentBlockIdx++;
+  if(STATE.currentBlockIdx>=STATE.blockDefs.length){showScreen('scr-q-intro');return;}
+  STATE.currentTrialInBlock=0;
+  const bi=STATE.currentBlockIdx,bd=STATE.blockDefs[bi],prev=bi>0?STATE.blockDefs[bi-1]:null;
+  document.getElementById('block-intro-title').textContent='Block '+(bi+1)+' of '+STATE.blockDefs.length;
+  let desc='';
+  if(bd.cueMode==='symbolic'&&(!prev||prev.cueMode!=='symbolic'))
+    desc+='<p>The locations will now display <strong>symbols</strong> instead of question marks. Pay very close attention to the symbols because they <strong>may help you to predict the hidden reward values</strong>.</p>';
+  else if(bd.cueMode==='symbolic'&&prev.symbolSet!==bd.symbolSet)
+    desc+='<p><strong>This block uses a new set of symbols.</strong> What you learned about the previous symbols does not apply to these. Again, pay close attention to them because they <strong>may help you to predict the hidden reward values</strong>.</p>';
+  else if(bd.cueMode==='symbolic')
+    desc+='<p>The locations will again display the <strong>same symbols</strong> as in the previous block.</p>';
+  const seenCost=STATE.blockDefs.slice(0,bi).some(b=>b.clickCost>0);   // costs are only ever mentioned once a costly block is reached
+  if(bd.clickCost>0)
+    desc='<div class="cost-warning"><div class="cw-head">Important: in this block, every click costs '+bd.clickCost+' points</div>'+
+      '<p style="margin:0">Each location you reveal will be subtracted from your score (&minus;'+bd.clickCost+' points per click), whether or not you end up visiting it. '+
+      'A red counter at the top of the screen will show how many points your clicks have cost on each trial.</p></div>'+desc;
+  else if(seenCost&&prev.clickCost!==bd.clickCost)
+    desc='<div class="free-notice">The cost of a click is changing: clicks are now free.</div>'+desc;
+  desc+='<p>Click locations to reveal values'+(bd.clickCost===0?(seenCost?' (<strong>free</strong>)':''):' (<strong>&minus;'+bd.clickCost+' points per click</strong>)')+', then press \'Execute plan\' and navigate using the arrow keys on your keyboard to collect revealed values. If you want to stop collecting values early, click \'Stop here\' (or press the spacebar).</p>';
+  desc+='<p>There are <strong>'+bd.trials+' trials</strong> in this block.</p>';
+  document.getElementById('block-intro-text').innerHTML=desc;
+  const symAns=bd.cueMode!=='symbolic'?'qmarks':((!prev||prev.cueMode!=='symbolic'||prev.symbolSet!==bd.symbolSet)?'new_symbols':'same_symbols');
+  const Q=[];
+  if(bd.clickCost>0||seenCost){
+    const costOpts=[...new Set([1,bd.clickCost||CONFIG.costlyClickCost,5])].filter(v=>v>0).sort((a,b)=>a-b)
+      .map(v=>[String(v),v+' point'+(v===1?'':'s')]).concat([['0','Nothing &mdash; clicks are free']]);
+    Q.push({name:'bcc',text:'How many points does each click cost in this block?',answer:String(bd.clickCost),opts:costOpts});
+  }
+  if(bd.clickCost>0)
+    Q.push({name:'bq_unvisited',text:'Do locations that you reveal but do not visit still cost points?',answer:'yes',
+      opts:[['yes','Yes &mdash; every click costs points'],['no','No &mdash; only the locations on my path cost points']]});
+  if(bd.cueMode==='symbolic')
+    Q.push({name:'bcs',text:'What will the locations show in this block?',answer:symAns,
+      opts:[['qmarks','Question marks'],['new_symbols','Symbols I have not seen before'],['same_symbols','The same symbols as the previous block']]});
+  STATE.blockQs=Q;
+  document.getElementById('bcc-title').textContent=bd.clickCost>0?'Quiz: please answer every question correctly to begin':'Brief comprehension check';
+  document.getElementById('block-intro-cc').style.display=Q.length?'':'none';
+  document.getElementById('bcc-questions').innerHTML=Q.map((q,k)=>'<p'+(k?' style="margin-top:12px"':'')+'>'+q.text+'</p>'+
+    q.opts.map(o=>'<label style="display:block;margin:4px 0 4px 16px;cursor:pointer"><input type="radio" name="'+q.name+'" value="'+o[0]+'" onchange="blockCCChanged()"> '+o[1]+'</label>').join('')).join('');
+  document.getElementById('bcc-err').textContent='';
+  STATE.blockCCErrors[bd.id]=0;STATE.blockCCAttempts[bd.id]=0;
+  document.getElementById('btn-check-cc').style.display='';
+  const btn=document.getElementById('btn-start-block');btn.disabled=Q.length>0;btn.style.background=Q.length?'#999':'#2a5a8a';
+  showScreen('scr-block-intro');
+}
+/* Answers are checked only when 'Check answers' is pressed; feedback never says which answer was wrong. */
+function blockCCChanged(){
+  const btn=document.getElementById('btn-start-block');btn.disabled=true;btn.style.background='#999';
+  document.getElementById('btn-check-cc').style.display='';
+  const e=document.getElementById('bcc-err');e.textContent='';e.style.color='';
+}
+function submitBlockCC(){
+  const bd=STATE.blockDefs[STATE.currentBlockIdx],btn=document.getElementById('btn-start-block'),e=document.getElementById('bcc-err');
+  const unanswered=STATE.blockQs.some(q=>!document.querySelector('input[name="'+q.name+'"]:checked'));
+  if(unanswered){e.style.color='';e.textContent='Please answer every question.';return;}
+  STATE.blockCCAttempts[bd.id]++;
+  const allOk=STATE.blockQs.every(q=>document.querySelector('input[name="'+q.name+'"]:checked').value===q.answer);
+  if(allOk){e.style.color='#1e7d32';e.textContent='All correct \u2014 click Begin when you are ready.';
+    document.getElementById('btn-check-cc').style.display='none';btn.disabled=false;btn.style.background='#2a5a8a';}
+  else{STATE.blockCCErrors[bd.id]++;e.style.color='';e.textContent='Not quite \u2014 please re-read the instructions above and check your answers.';
+    btn.disabled=true;btn.style.background='#999';}
+}
+function startBlock(){if(document.getElementById('btn-start-block').disabled)return;STATE.currentTrialInBlock=0;nextTrial();}
+function afterBlock(){
+  const sl=document.getElementById('br-slider');sl.value=50;sl.style.opacity='0.35';delete sl.dataset.touched;
+  document.getElementById('br-err').textContent='';STATE.brT0=ts();showScreen('scr-block-rating');
+}
+function submitBlockRating(){
+  const sl=document.getElementById('br-slider');
+  if(!sl.dataset.touched){document.getElementById('br-err').textContent='Please move the slider to give your answer.';return;}
+  const bd=STATE.blockDefs[STATE.currentBlockIdx];
+  STATE.blockRatings.push({blockId:bd.id,rating:parseInt(sl.value),rt:ts()-STATE.brT0,score:STATE.blockScores[bd.id]||0});
+  if(CONFIG.strategyReflection){document.getElementById('strategy-text').value='';showScreen('scr-strategy');}
+  else afterStrategy();
+}
+function submitStrategy(){
+  const bd=STATE.blockDefs[STATE.currentBlockIdx];
+  if(document.getElementById('strategy-text').value.trim().length<3){document.getElementById('strategy-err').textContent='Please write a short description of your strategy to continue.';return;}
+  document.getElementById('strategy-err').textContent='';
+  STATE.strategyComments.push({blockId:bd.id,text:document.getElementById('strategy-text').value.trim()});
+  document.getElementById('strategy-text').value='';
+  afterStrategy();
+}
+function afterStrategy(){
+  if(STATE.blockDefs[STATE.currentBlockIdx].cueMode==='symbolic')startValEst();   // symbol knowledge tests only after symbolic blocks
+  else endOfBlock();
+}
+function endOfBlock(){
+  if(STATE.currentBlockIdx<STATE.blockDefs.length-1)showScreen('scr-separator');
+  else showScreen('scr-q-intro');
+}
+
+/* ============================================================
+   VALUE ESTIMATES
+   ============================================================ */
+let VE=null;
+function startValEst(){const bd=STATE.blockDefs[STATE.currentBlockIdx];VE={bd,syms:shuffle(bd.symbols),idx:0};showScreen('scr-val-est');showValEst();}
+function showValEst(){
+  if(VE.idx>=VE.syms.length){startPairedChoice();return;}
+  const sym=VE.syms[VE.idx],cv=document.getElementById('ve-sym-cv').getContext('2d');
+  cv.setTransform(2.5,0,0,2.5,0,0);cv.clearRect(0,0,60,60);drawSymbol(cv,sym,30,30,22,'#444');
+  document.getElementById('ve-progress').textContent='Symbol '+(VE.idx+1)+' of '+VE.syms.length;
+  document.getElementById('ve-value').value='';
+  const sl=document.getElementById('ve-conf');sl.value=5;sl.style.opacity='0.35';delete sl.dataset.touched;
+  document.getElementById('ve-err').textContent='';VE.showTime=ts();
+}
+function submitValEst(){
+  const val=document.getElementById('ve-value').value.trim(),num=parseFloat(val);
+  if(val===''||isNaN(num)){document.getElementById('ve-err').textContent='Please enter a number.';return;}
+  if(!document.getElementById('ve-conf').dataset.touched){document.getElementById('ve-err').textContent='Please select a confidence level to continue.';return;}
+  const sym=VE.syms[VE.idx],tm=symMean(VE.bd,sym);
+  STATE.valEstData.push({block_id:VE.bd.id,symbol:symName(sym),probe_index:VE.idx+1,estimated_value:num,true_mean:tm,
+    signed_error:num-tm,confidence:parseInt(document.getElementById('ve-conf').value),rt_ms:ts()-VE.showTime});
+  VE.idx++;showValEst();
+}
+
+/* ============================================================
+   PAIRED CHOICE
+   ============================================================ */
+let PC=null;
+function genPairs(syms){const pairs=[];for(let i=0;i<syms.length;i++)for(let j=i+1;j<syms.length;j++)pairs.push([syms[i],syms[j]]);return shuffle(pairs).map(p=>Math.random()<.5?p:[p[1],p[0]]);}
+function startPairedChoice(){const bd=STATE.blockDefs[STATE.currentBlockIdx];PC={bd,pairs:genPairs(bd.symbols),idx:0,chosenSide:null};showScreen('scr-pairs');showPair();}
+function showPair(){
+  if(PC.idx>=PC.pairs.length){endOfBlock();return;}
+  const[left,right]=PC.pairs[PC.idx];
+  const lc=document.getElementById('pair-left-cv').getContext('2d'),rc=document.getElementById('pair-right-cv').getContext('2d');
+  lc.setTransform(220/90,0,0,220/90,0,0);rc.setTransform(220/90,0,0,220/90,0,0);
+  lc.clearRect(0,0,90,90);rc.clearRect(0,0,90,90);drawSymbol(lc,left,45,45,32,'#444');drawSymbol(rc,right,45,45,32,'#444');
+  document.getElementById('pairs-progress').textContent='Pair '+(PC.idx+1)+' of '+PC.pairs.length;
+  document.getElementById('pairs-conf-area').style.display='none';
+  document.getElementById('pair-left-box').classList.remove('chosen');document.getElementById('pair-right-box').classList.remove('chosen');
+  const sl=document.getElementById('conf-slider');sl.value=5;sl.style.opacity='0.35';delete sl.dataset.touched;
+  document.getElementById('pairs-conf-err').textContent='';PC.chosenSide=null;PC.choiceStart=ts();
+}
+function pairChoice(side){
+  if(!PC||PC.chosenSide)return;PC.chosenSide=side;PC.choiceRT=ts()-PC.choiceStart;
+  document.getElementById(side==='left'?'pair-left-box':'pair-right-box').classList.add('chosen');
+  document.getElementById('pairs-conf-area').style.display='block';PC.confStart=ts();
+}
+function submitPairConf(){
+  if(!PC.chosenSide)return;
+  if(!document.getElementById('conf-slider').dataset.touched){document.getElementById('pairs-conf-err').textContent='Please select a confidence level to continue.';return;}
+  const[left,right]=PC.pairs[PC.idx],chosen=PC.chosenSide==='left'?left:right,other=PC.chosenSide==='left'?right:left;
+  const bd=PC.bd;
+  STATE.pairedChoiceData.push({block_id:bd.id,pair_num:PC.idx+1,left:symName(left),right:symName(right),chosen:symName(chosen),other:symName(other),
+    chosen_mean:bd.means[chosen],other_mean:bd.means[other],
+    chosen_side:PC.chosenSide,correct:bd.means[chosen]>bd.means[other]?1:0,confidence:parseInt(document.getElementById('conf-slider').value),
+    rt_choice_ms:PC.choiceRT,rt_conf_ms:ts()-PC.confStart});
+  PC.chosenSide=null;PC.idx++;showPair();
+}
+
+/* ============================================================
+   QUESTIONNAIRES: PHQ-8 (optionally PHQ-9), GAD-7, IUS-12
+   ============================================================ */
+const RESP_2WK=['Not at all','Several days','More than half the days','Nearly every day'];
+const RESP_IUS=['Not at all characteristic of me','A little characteristic of me','Somewhat characteristic of me','Very characteristic of me','Entirely characteristic of me'];
+const STEM_2WK='Over the <strong>last 2 weeks</strong>, how often have you been bothered by any of the following problems?';
+function buildQDefs(){
+  const phq=[
+    {id:'phq1',text:'Little interest or pleasure in doing things'},
+    {id:'phq2',text:'Feeling down, depressed, or hopeless'},
+    {id:'phq3',text:'Trouble falling or staying asleep, or sleeping too much'},
+    {id:'phq4',text:'Feeling tired or having little energy'},
+    {id:'phq5',text:'Poor appetite or overeating'},
+    {id:'attn_phq',text:'To show that you are reading carefully, please select \u201cMore than half the days\u201d for this item.',attn:2},
+    {id:'phq6',text:'Feeling bad about yourself \u2014 or that you are a failure or have let yourself or your family down'},
+    {id:'phq7',text:'Trouble concentrating on things, such as reading the newspaper or watching television'},
+    {id:'phq8',text:'Moving or speaking so slowly that other people could have noticed. Or the opposite \u2014 being so fidgety or restless that you have been moving around a lot more than usual'}];
+  if(CONFIG.includePHQ9Item9)phq.push({id:'phq9',text:'Thoughts that you would be better off dead, or of hurting yourself in some way'});
+  const gad=[
+    {id:'gad1',text:'Feeling nervous, anxious, or on edge'},
+    {id:'gad2',text:'Not being able to stop or control worrying'},
+    {id:'gad3',text:'Worrying too much about different things'},
+    {id:'gad4',text:'Trouble relaxing'},
+    {id:'gad5',text:'Being so restless that it is hard to sit still'},
+    {id:'gad6',text:'Becoming easily annoyed or irritable'},
+    {id:'gad7',text:'Feeling afraid, as if something awful might happen'}];
+  const ius=[
+    {id:'ius1',text:'Unforeseen events upset me greatly.',sub:'P'},
+    {id:'ius2',text:'It frustrates me not having all the information I need.',sub:'P'},
+    {id:'ius3',text:'Uncertainty keeps me from living a full life.',sub:'I'},
+    {id:'ius4',text:'One should always look ahead so as to avoid surprises.',sub:'P'},
+    {id:'ius5',text:'A small unforeseen event can spoil everything, even with the best of planning.',sub:'P'},
+    {id:'ius6',text:'When it\u2019s time to act, uncertainty paralyses me.',sub:'I'},
+    {id:'ius7',text:'When I am uncertain I can\u2019t function very well.',sub:'I'},
+    {id:'attn_ius',text:'To show that you are reading carefully, please select \u201cSomewhat characteristic of me\u201d for this item.',attn:3},
+    {id:'ius8',text:'I always want to know what the future has in store for me.',sub:'P'},
+    {id:'ius9',text:'I can\u2019t stand being taken by surprise.',sub:'P'},
+    {id:'ius10',text:'The smallest doubt can stop me from acting.',sub:'I'},
+    {id:'ius11',text:'I should be able to organise everything in advance.',sub:'P'},
+    {id:'ius12',text:'I must get away from all uncertain situations.',sub:'I'}];
+  const oci=[
+    {id:'oci1',text:'I have saved up so many things that they get in the way.',sub:'hoarding'},
+    {id:'oci2',text:'I check things more often than necessary.',sub:'checking'},
+    {id:'oci3',text:'I get upset if objects are not arranged properly.',sub:'ordering'},
+    {id:'oci4',text:'I feel compelled to count while I am doing things.',sub:'neutralising'},
+    {id:'oci5',text:'I find it difficult to touch an object when I know it has been touched by strangers or certain people.',sub:'washing'},
+    {id:'oci6',text:'I find it difficult to control my own thoughts.',sub:'obsessing'},
+    {id:'oci7',text:'I collect things I don\u2019t need.',sub:'hoarding'},
+    {id:'oci8',text:'I repeatedly check doors, windows, drawers, etc.',sub:'checking'},
+    {id:'oci9',text:'I get upset if others change the way I have arranged things.',sub:'ordering'},
+    {id:'attn_oci',text:'To show that you are reading carefully, please select \u201cA lot\u201d for this item.',attn:3},
+    {id:'oci10',text:'I feel I have to repeat certain numbers.',sub:'neutralising'},
+    {id:'oci11',text:'I sometimes have to wash or clean myself simply because I feel contaminated.',sub:'washing'},
+    {id:'oci12',text:'I am upset by unpleasant thoughts that come into my mind against my will.',sub:'obsessing'},
+    {id:'oci13',text:'I avoid throwing things away because I am afraid I might need them later.',sub:'hoarding'},
+    {id:'oci14',text:'I repeatedly check gas and water taps and light switches after turning them off.',sub:'checking'},
+    {id:'oci15',text:'I need things to be arranged in a particular way.',sub:'ordering'},
+    {id:'oci16',text:'I feel that there are good and bad numbers.',sub:'neutralising'},
+    {id:'oci17',text:'I wash my hands more often and longer than necessary.',sub:'washing'},
+    {id:'oci18',text:'I frequently get nasty thoughts and have difficulty in getting rid of them.',sub:'obsessing'}];
+  return {
+    oci:{id:'oci',stem:'The following statements refer to experiences that many people have in their everyday lives. Choose the option that best describes <strong>how much that experience has distressed or bothered you during the past month</strong>.',
+      labels:['Not at all','A little','Moderately','A lot','Extremely'],values:[0,1,2,3,4],items:oci},
+    phq:{id:'phq',stem:STEM_2WK,labels:RESP_2WK,values:[0,1,2,3],items:phq},
+    gad:{id:'gad',stem:STEM_2WK,labels:RESP_2WK,values:[0,1,2,3],items:gad},
+    ius:{id:'ius',stem:'Please read each statement and choose the option that best describes <strong>how characteristic it is of you</strong>.',labels:RESP_IUS,values:[1,2,3,4,5],items:ius}};
+}
+const Q_DEFS=buildQDefs();
+function startQuestionnaires(){STATE.qi=0;renderQ();}
+function renderQ(){
+  const qd=Q_DEFS[STATE.qOrder[STATE.qi]];
+  document.getElementById('q-h1').textContent='Questionnaire '+(STATE.qi+1)+' of '+STATE.qOrder.length;
+  document.getElementById('q-stem').innerHTML=qd.stem;
+  document.getElementById('q-opts').innerHTML=qd.values.map((v,k)=>'<button class="q-opt" data-v="'+v+'" onclick="qAnswer('+v+')">'+qd.labels[k]+'</button>').join('');
+  STATE.qCur={qd,idx:0,resp:{},rts:{},t0:ts(),busy:false};
+  showScreen('scr-q');showQItem();
+}
+function showQItem(){
+  const c=STATE.qCur,it=c.qd.items[c.idx],box=document.getElementById('q-item');
+  box.textContent=it.text;box.classList.remove('fade');
+  document.getElementById('q-progress').textContent='Question '+(c.idx+1)+' of '+c.qd.items.length;
+  document.querySelectorAll('#q-opts .q-opt').forEach(b=>{b.classList.toggle('sel',c.resp[it.id]!==undefined&&+b.dataset.v===c.resp[it.id]);b.blur();});
+  document.getElementById('q-back').style.visibility=c.idx>0?'visible':'hidden';
+  c.itemT0=ts();c.busy=true;
+  const opts=document.getElementById('q-opts');opts.classList.add('locked');
+  const myIdx=c.idx;
+  setTimeout(()=>{if(STATE.qCur===c&&c.idx===myIdx){c.busy=false;opts.classList.remove('locked');}},CONFIG.qMinItemMs);
+}
+function qAnswer(v){
+  const c=STATE.qCur;if(!c||c.busy)return;c.busy=true;
+  const it=c.qd.items[c.idx];c.resp[it.id]=v;c.rts[it.id]=ts()-c.itemT0;
+  document.querySelectorAll('#q-opts .q-opt').forEach(b=>b.classList.toggle('sel',+b.dataset.v===v));
+  document.getElementById('q-item').classList.add('fade');
+  setTimeout(()=>{c.idx++;if(c.idx<c.qd.items.length)showQItem();else finishQ();},300);
+}
+function qBack(){
+  const c=STATE.qCur;if(!c||c.busy||c.idx===0)return;
+  c.idx--;showQItem();
+}
+function finishQ(){
+  const c=STATE.qCur,qd=c.qd;
+  STATE.q[qd.id]={resp:c.resp,item_rts:c.rts,rt_ms:ts()-c.t0,position:STATE.qi+1};
+  if(qd.id==='phq'&&CONFIG.includePHQ9Item9&&c.resp.phq9>0)STATE.item9Flag=true;
+  STATE.qi++;
+  if(STATE.qi<STATE.qOrder.length)renderQ();else showScreen('scr-demographics');
+}
+function scoreQuestionnaires(){
+  const r=k=>STATE.q[k]?STATE.q[k].resp:{},sum=(o,ids)=>ids.reduce((a,id)=>a+(o[id]||0),0),rng=(p,a,b)=>{const x=[];for(let i=a;i<=b;i++)x.push(p+i);return x};
+  const phq=r('phq'),gad=r('gad'),ius=r('ius'),oci=r('oci'),out={};
+  out.phq8_total=sum(phq,rng('phq',1,8));
+  out.phq9_item9=CONFIG.includePHQ9Item9?phq.phq9:'';
+  out.phq9_total=CONFIG.includePHQ9Item9?out.phq8_total+phq.phq9:'';
+  out.gad7_total=sum(gad,rng('gad',1,7));
+  out.ius12_total=sum(ius,rng('ius',1,12));
+  out.ius12_prospective=sum(ius,['ius1','ius2','ius4','ius5','ius8','ius9','ius11']);
+  out.ius12_inhibitory=sum(ius,['ius3','ius6','ius7','ius10','ius12']);
+  out.ocir_total=sum(oci,rng('oci',1,18));
+  ['hoarding','checking','ordering','neutralising','washing','obsessing'].forEach(sub=>{
+    out['ocir_'+sub]=sum(oci,Q_DEFS.oci.items.filter(it=>it.sub===sub).map(it=>it.id));});
+  out.attn_phq_pass=phq.attn_phq===2?1:0;
+  out.attn_ius_pass=ius.attn_ius===3?1:0;
+  out.attn_oci_pass=oci.attn_oci===3?1:0;
+  out.attention_checks_passed=out.attn_phq_pass+out.attn_ius_pass+out.attn_oci_pass;
+  out.attention_checks_total=3;
+  ['phq','gad','ius','oci'].forEach(k=>{
+    Q_DEFS[k].items.forEach(it=>{out[it.id]=r(k)[it.id];out[it.id+'_rt']=STATE.q[k]&&STATE.q[k].item_rts?STATE.q[k].item_rts[it.id]:'';});
+    out[k+'_rt_ms']=STATE.q[k]?STATE.q[k].rt_ms:'';out[k+'_position']=STATE.q[k]?STATE.q[k].position:'';
+  });
+  return out;
+}
+
+/* ============================================================
+   DEMOGRAPHICS, SAVE, DEBRIEF
+   ============================================================ */
+function submitDemographics(){
+  const agePnts=document.getElementById('demo-age-pnts').checked,ageVal=document.getElementById('demo-age').value;
+  const gen=document.getElementById('demo-gender').value,eng=document.getElementById('demo-english').value,edu=document.getElementById('demo-education').value;
+  if((!agePnts&&!ageVal)||!gen||!eng||!edu){document.getElementById('demo-err').textContent='Please complete each field to continue (each has a "Prefer not to say" option).';return;}
+  document.getElementById('demo-err').textContent='';
+  STATE.demographics={age:agePnts?'Prefer not to say':ageVal,gender:gen,english:eng,education:edu};
+  finishStudy();
+}
+async function finishStudy(){
+  showScreen('scr-saving');
+  STATE.csv=buildCSV();
+  const d=new Date();
+  STATE.filename=CONFIG.studyTag+'_'+STATE.participantId+'_'+d.toISOString().slice(0,10)+'_'+d.toTimeString().slice(0,8).replace(/:/g,'-')+'.csv';
+  let ok=false;
+  for(let attempt=1;attempt<=3&&!ok;attempt++){
+    try{const res=await sendToPipe(STATE.filename,STATE.csv);ok=!!(res&&res.ok);}catch(e){ok=false;}
+    if(!ok&&attempt<3)await new Promise(r=>setTimeout(r,1500*attempt));
+  }
+  showDebrief(ok);
+}
+function showDebrief(saved){
+  document.getElementById('save-fail').style.display=saved?'none':'block';
+  document.getElementById('item9-box').style.display=STATE.item9Flag?'block':'none';
+  document.getElementById('debrief-total').textContent=STATE.totalScore;
+  const tbody=document.getElementById('debrief-block-rows');tbody.innerHTML='';
+  STATE.blockDefs.forEach((bd,i)=>{const tr=document.createElement('tr');
+    tr.innerHTML='<td style="padding:4px 16px;border-bottom:1px solid #ddd;text-align:center">'+(i+1)+'</td><td style="padding:4px 16px;border-bottom:1px solid #ddd;text-align:center">'+(STATE.blockScores[bd.id]||0)+'</td>';
+    tbody.appendChild(tr);});
+  if(CONFIG.sonaCreditUrl){
+    const u=CONFIG.sonaCreditUrl.replace('XXXX',encodeURIComponent(STATE.participantId)).replace('{ID}',encodeURIComponent(STATE.participantId));
+    const a=document.getElementById('credit-btn');a.href=u;a.style.display='';
+    document.getElementById('credit-auto').style.display='';document.getElementById('credit-manual').style.display='none';}
+  showScreen('scr-debrief');
+}
+function downloadLocal(){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([STATE.csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=STATE.filename;document.body.appendChild(a);a.click();a.remove();
+}
+function sendToPipe(filename,csv){
+  return fetch('https://pipe.jspsych.org/api/data/',{method:'POST',headers:{'Content-Type':'application/json',Accept:'*/*'},keepalive:true,
+    body:JSON.stringify({experimentID:CONFIG.dataPipeId,filename:filename,data:csv})});
+}
+function buildCSV(){
+  const nav=typeof navigator!=='undefined'?navigator:{},scr=typeof screen!=='undefined'?screen:{};
+  const pd={session_datetime:new Date().toISOString(),recruitment_source:'sona',sona_id_from_url:STATE.sonaFromUrl?1:0,consent_timestamp:STATE.consentTimestamp,
+    session_duration_ms:ts()-STATE.studyT0,user_agent:(nav.userAgent||''),
+    viewport:(typeof window!=='undefined'&&window.innerWidth?window.innerWidth+'x'+window.innerHeight:''),
+    screen_size:(scr.width?scr.width+'x'+scr.height:''),
+    quiz_attempts:STATE.quizAttempts,score_total:STATE.totalScore,
+    age:STATE.demographics.age||'',gender:STATE.demographics.gender||'',english_first:STATE.demographics.english||'',education:STATE.demographics.education||'',
+    cfg_depth_sd_nonsymbolic:[1,2,3].map(d=>CONFIG.depthSD[d]).join('|'),cfg_sym_means:CONFIG.symMeans.join('|'),cfg_sym_sd:CONFIG.symSD,cfg_q_min_item_ms:CONFIG.qMinItemMs,cfg_planted_trials:CONFIG.plantedTrials,cfg_plant_margin:CONFIG.plantMargin,cfg_counterbalance_cost_order:CONFIG.counterbalanceCostOrder?1:0,
+    cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,
+    cfg_phq9_item9_included:CONFIG.includePHQ9Item9?1:0};
+  Object.assign(pd,STATE.cb);
+  STATE.blockDefs.forEach((bd,i)=>{pd['score_'+bd.id]=STATE.blockScores[bd.id]||0;pd['block_cc_errors_'+bd.id]=STATE.blockCCErrors[bd.id]||0;pd['block_cc_attempts_'+bd.id]=STATE.blockCCAttempts[bd.id]||0;});
+  STATE.strategyComments.forEach(sc=>{pd['strategy_'+sc.blockId]=sc.text||'';});
+  STATE.blockRatings.forEach(r=>{pd['self_rating_'+r.blockId]=r.rating;pd['self_rating_rt_'+r.blockId]=r.rt;});
+  STATE.valEstData.forEach(v=>{const k='ve_'+v.block_id+'_'+v.symbol+'_';
+    pd[k+'est']=v.estimated_value;pd[k+'true']=v.true_mean;pd[k+'err']=v.signed_error;pd[k+'conf']=v.confidence;pd[k+'rt']=v.rt_ms;});
+  STATE.blockDefs.filter(bd=>bd.cueMode==='symbolic').forEach(bd=>{
+    const b=STATE.pairedChoiceData.filter(p=>p.block_id===bd.id);
+    pd['pc_'+bd.id+'_correct']=b.filter(p=>p.correct===1).length;
+    pd['pc_'+bd.id+'_total']=b.length;
+    pd['pc_'+bd.id+'_mean_conf']=b.length?Math.round(b.reduce((a,p)=>a+p.confidence,0)/b.length*100)/100:'';
+    b.forEach(p=>{const k='pc_'+bd.id+'_p'+p.pair_num+'_';
+      pd[k+'left']=p.left;pd[k+'right']=p.right;pd[k+'chosen']=p.chosen;pd[k+'correct']=p.correct;
+      pd[k+'conf']=p.confidence;pd[k+'rt']=p.rt_choice_ms;});
+  });
+  Object.assign(pd,scoreQuestionnaires());
+  const rows=STATE.events.map(e=>Object.assign({},e,pd));
+  if(!rows.length)rows.push(Object.assign({sona_id:STATE.participantId},pd));
+  const lead=['session_datetime','sona_id','recruitment_source','block_id','block_number','block_cue_mode','block_variance','block_symbol_set','block_click_cost','trial_in_block','trial_global',
+    'is_practice','trial_type','loss_node','phase','event_type','event_timestamp_ms','event_time_in_trial_ms','node_id','node_depth','node_value','node_cue',
+    'node_cue_mean','node_on_exp_best_route','click_number','route','route_values','path_reward','click_cost','trial_score',
+    'n_clicks','n_clicks_d1','n_clicks_d2','n_clicks_d3','prop_nodes_revealed','first_click_depth','n_clicks_on_route','n_clicks_off_route',
+    'n_clicks_after_route_revealed','excess_clicks','route_through_loss','loss_subtree_expanded','n_clicks_in_loss_subtree','loss_route_optimal_at_block_cost','revealed_best_through_loss','exp_best_route','exp_best_net','exp_second_net','exp_margin','chose_exp_best_route','exp_shortfall',
+    'score_total','phq8_total','phq9_total','gad7_total','ius12_total','ius12_prospective','ius12_inhibitory','ocir_total','ocir_checking','attention_checks_passed'];
+  const ks=new Set();rows.forEach(r=>Object.keys(r).forEach(k=>ks.add(k)));
+  const keys=[...lead.filter(k=>ks.has(k)),...[...ks].filter(k=>!lead.includes(k))];
+  const esc=v=>{const s=(v===undefined||v===null)?'':String(v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  return keys.join(',')+'\n'+rows.map(r=>keys.map(k=>esc(r[k])).join(',')).join('\n');
+}
+readSonaId();
+</script>
+</body>
+</html>
