@@ -160,7 +160,9 @@ textarea{max-width:100%;min-height:80px}
     <label><input type="radio" name="q6" value="a"> Complete the task as quickly as possible</label>
     <label><input type="radio" name="q6" value="b"> Click as many locations as possible</label>
     <label><input type="radio" name="q6" value="c"> Earn as many points as possible</label></div>
-  <p class="err" id="quiz-err"></p><button onclick="submitQuiz()">Submit</button>
+  <button id="btn-quiz-check" onclick="submitQuiz()">Check answers</button>
+  <p class="err" id="quiz-err"></p>
+  <button id="btn-quiz-continue" onclick="quizContinue()" style="display:none">Continue</button>
 </div>
 
 <!-- ================= BLOCK INTRO ================= -->
@@ -271,28 +273,31 @@ textarea{max-width:100%;min-height:80px}
 </div>
 
 <!-- ================= DEMOGRAPHICS ================= -->
+<div class="screen" id="scr-q-break">
+  <h1>Thank you for your responses.</h1>
+  <button onclick="renderQ()" style="background:#27ae60;font-size:1.05em;padding:12px 30px;margin-top:18px">Continue to the next questionnaire</button>
+</div>
+
 <div class="screen" id="scr-demographics">
   <h1>Demographics</h1>
   <div class="form-row"><label>Age</label><input type="number" id="demo-age" min="16" max="99" style="max-width:120px"> <label style="font-weight:normal;display:inline;margin-left:12px"><input type="checkbox" id="demo-age-pnts" onchange="if(this.checked){document.getElementById('demo-age').value='';document.getElementById('demo-age').disabled=true;}else{document.getElementById('demo-age').disabled=false;}"> Prefer not to say</label></div>
   <div class="form-row"><label>Gender</label><select id="demo-gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option></select></div>
   <div class="form-row"><label>Is English your first language?</label><select id="demo-english"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
-  <div class="form-row"><label>Highest education completed</label><select id="demo-education"><option value="">Select…</option><option>GCSEs or equivalent</option><option>A-levels or equivalent</option><option>Undergraduate degree</option><option>Postgraduate degree</option><option>Doctoral degree</option><option>Other</option><option>Prefer not to say</option></select></div>
+  <div class="form-row"><label>Have you ever received a formal diagnosis from a health professional of any of the following? (optional; tick all that apply)</label>
+    <div class="consent-item"><input type="checkbox" class="diag" id="diag-depression" onchange="diagChanged(this)"><span>Depression</span></div>
+    <div class="consent-item"><input type="checkbox" class="diag" id="diag-anxiety" onchange="diagChanged(this)"><span>An anxiety disorder (for example, generalised anxiety disorder, panic disorder or social anxiety disorder)</span></div>
+    <div class="consent-item"><input type="checkbox" class="diag" id="diag-ocd" onchange="diagChanged(this)"><span>Obsessive-compulsive disorder (OCD)</span></div>
+    <div class="consent-item"><input type="checkbox" class="diag diag-excl" id="diag-none" onchange="diagChanged(this)"><span>None of these</span></div>
+    <div class="consent-item"><input type="checkbox" class="diag diag-excl" id="diag-unsure" onchange="diagChanged(this)"><span>Not sure</span></div>
+    <div class="consent-item"><input type="checkbox" class="diag diag-excl" id="diag-pnts" onchange="diagChanged(this)"><span>Prefer not to say</span></div>
+  </div>
   <p class="err" id="demo-err"></p>
   <button onclick="submitDemographics()">Continue</button>
-</div>
-
-<div class="screen" id="scr-saving">
-  <h1>Saving your responses&hellip;</h1>
-  <p>Please wait a moment and <strong>do not close this window</strong>.</p>
 </div>
 
 <!-- ================= DEBRIEF ================= -->
 <div class="screen" id="scr-debrief">
   <h1>Debriefing</h1>
-  <div id="save-fail" class="alert" style="display:none">
-    <p><strong>We could not save your data automatically.</strong> Please click the button below to download your data file, then email it to the research team at samuel.jones@bangor.ac.uk so that you can receive your credit.</p>
-    <button onclick="downloadLocal()">Download my data file</button>
-  </div>
   <div id="item9-box" class="alert" style="display:none">
     <p style="margin:0"><strong>Please look after yourself.</strong> One of your answers suggested you may have had thoughts that you would be better off dead, or of hurting yourself. Because your answers are anonymous we cannot contact you, so please consider talking to someone today. You can call the <strong>Student Wellbeing Helpline free on 0800 028 3766</strong> or <strong>Samaritans free on 116 123</strong> at any time, or text <strong>SHOUT to 85258</strong>. If you are in immediate danger, call <strong>999</strong>.</p>
   </div>
@@ -343,7 +348,7 @@ textarea{max-width:100%;min-height:80px}
   <p>If you have any questions or concerns about this work, please contact project lead Dr Sam Jones via email at <a href="mailto:samuel.jones@bangor.ac.uk">samuel.jones@bangor.ac.uk</a>. Alternatively, please contact Bangor University's Senior Research Governance &amp; Policy Officer at <a href="mailto:seniorresearchgovofficer@bangor.ac.uk">seniorresearchgovofficer@bangor.ac.uk</a>.</p>
   <div class="credit-box">
     <p id="credit-auto" style="display:none;margin:0 0 10px">When you are ready, click the button below to confirm that you have finished. This grants your SONA credit.</p>
-    <a id="credit-btn" href="#" style="display:none"><button>Receive my SONA credit</button></a>
+    <a id="credit-btn" href="#" style="display:none" onclick="goToCredit(event)"><button>Receive my SONA credit</button></a>
     <p id="credit-manual" style="margin:0">Your participation has been recorded. Your credit will be granted in SONA by the research team.</p>
   </div>
   <p>Thank you once again.</p>
@@ -373,7 +378,7 @@ const CONFIG={
   newSymbolsForCost5:true,  // true: block 4 uses a fresh symbol set (so the cost effect isn't carried by prior learning)
   includePHQ9Item9:false,   // PHQ-8 by default. If true, item 9 is asked and endorsers see a support box.
   strategyReflection:true,
-  qMinItemMs:800,           // questionnaire answer buttons are inactive for this long after each item appears
+  qMinItemMs:1000,           // questionnaire answer buttons are inactive for this long after each item appears
   dataPipeId:'5HYh2n8mS8O8',          // DataPipe experiment ID (DataPipe saves the files to the Google Drive linked to this experiment)
   // SONA: set the study URL in SONA to  ...task.html?id=%SURVEY_CODE%
   // and paste SONA's client-side completion URL here (it ends in survey_code=XXXX; leave XXXX in place):
@@ -472,12 +477,20 @@ function sendConsent(){
   sendToPipe(CONFIG.studyTag+'_p'+STATE.participantId+'_consent.csv',csv).catch(()=>{});
 }
 function submitQuiz(){
+  const ans={q1:'c',q2:'c',q3:'a',q4:'c',q5:'a',q6:'c'},e=document.getElementById('quiz-err');
+  if(Object.keys(ans).some(n=>!document.querySelector('input[name="'+n+'"]:checked'))){e.style.color='';e.textContent='Please answer every question.';return;}
   STATE.quizAttempts++;
-  const ans={q1:'c',q2:'c',q3:'a',q4:'c',q5:'a',q6:'c'};let pass=true;
-  for(const[n,a]of Object.entries(ans)){const s=document.querySelector('input[name="'+n+'"]:checked');if(!s||s.value!==a)pass=false;}
-  if(pass){document.getElementById('quiz-err').textContent='';advanceToNextBlock();}
-  else document.getElementById('quiz-err').textContent='Not quite — please check your answers and try again.';
+  const pass=Object.entries(ans).every(([n,a])=>document.querySelector('input[name="'+n+'"]:checked').value===a);
+  if(pass){e.style.color='#1e7d32';e.textContent='All correct \u2014 click Continue when you are ready.';
+    document.getElementById('btn-quiz-check').style.display='none';document.getElementById('btn-quiz-continue').style.display='';}
+  else{e.style.color='';e.textContent='Not quite \u2014 please re-read the instructions and check your answers.';}
 }
+function quizContinue(){document.getElementById('btn-quiz-continue').style.display='none';advanceToNextBlock();}
+document.addEventListener('change',ev=>{   // changing an answer after passing requires re-checking
+  if(ev.target&&ev.target.name&&/^q[1-6]$/.test(ev.target.name)&&document.getElementById('scr-quiz').classList.contains('active')){
+    document.getElementById('btn-quiz-continue').style.display='none';document.getElementById('btn-quiz-check').style.display='';
+    const e=document.getElementById('quiz-err');e.textContent='';e.style.color='';}
+});
 
 /* ============================================================
    BOARDS
@@ -995,7 +1008,7 @@ function finishQ(){
   STATE.q[qd.id]={resp:c.resp,item_rts:c.rts,rt_ms:ts()-c.t0,position:STATE.qi+1};
   if(qd.id==='phq'&&CONFIG.includePHQ9Item9&&c.resp.phq9>0)STATE.item9Flag=true;
   STATE.qi++;
-  if(STATE.qi<STATE.qOrder.length)renderQ();else showScreen('scr-demographics');
+  if(STATE.qi<STATE.qOrder.length)showScreen('scr-q-break');else showScreen('scr-demographics');
 }
 function scoreQuestionnaires(){
   const r=k=>STATE.q[k]?STATE.q[k].resp:{},sum=(o,ids)=>ids.reduce((a,id)=>a+(o[id]||0),0),rng=(p,a,b)=>{const x=[];for(let i=a;i<=b;i++)x.push(p+i);return x};
@@ -1025,28 +1038,50 @@ function scoreQuestionnaires(){
 /* ============================================================
    DEMOGRAPHICS, SAVE, DEBRIEF
    ============================================================ */
+/* 'None of these', 'Not sure' and 'Prefer not to say' each clear the other boxes; ticking a diagnosis clears them. The question is optional. */
+function diagChanged(el){
+  if(!el.checked)return;
+  if(el.classList.contains('diag-excl'))document.querySelectorAll('.diag').forEach(c=>{if(c!==el)c.checked=false;});
+  else document.querySelectorAll('.diag-excl').forEach(c=>{c.checked=false;});
+}
 function submitDemographics(){
   const agePnts=document.getElementById('demo-age-pnts').checked,ageVal=document.getElementById('demo-age').value;
-  const gen=document.getElementById('demo-gender').value,eng=document.getElementById('demo-english').value,edu=document.getElementById('demo-education').value;
-  if((!agePnts&&!ageVal)||!gen||!eng||!edu){document.getElementById('demo-err').textContent='Please complete each field to continue (each has a "Prefer not to say" option).';return;}
+  const gen=document.getElementById('demo-gender').value,eng=document.getElementById('demo-english').value;
+  if((!agePnts&&!ageVal)||!gen||!eng){document.getElementById('demo-err').textContent='Please complete each field to continue (each has a "Prefer not to say" option).';return;}
   document.getElementById('demo-err').textContent='';
-  STATE.demographics={age:agePnts?'Prefer not to say':ageVal,gender:gen,english:eng,education:edu};
+  const dg=id=>document.getElementById('diag-'+id).checked?1:0,answered=[...document.querySelectorAll('.diag')].some(c=>c.checked);
+  STATE.demographics={age:agePnts?'Prefer not to say':ageVal,gender:gen,english:eng,
+    diag_answered:answered?1:0,diag_depression:answered?dg('depression'):'',diag_anxiety:answered?dg('anxiety'):'',diag_ocd:answered?dg('ocd'):'',
+    diag_none:answered?dg('none'):'',diag_not_sure:answered?dg('unsure'):'',diag_prefer_not_to_say:answered?dg('pnts'):''};
   finishStudy();
 }
-async function finishStudy(){
-  showScreen('scr-saving');
+/* Data are sent in the background while the participant reads the debrief (up to 5 attempts).
+   The credit button waits for the upload to finish before leaving the page. */
+function finishStudy(){
   STATE.csv=buildCSV();
   const d=new Date();
   STATE.filename=CONFIG.studyTag+'_'+STATE.participantId+'_'+d.toISOString().slice(0,10)+'_'+d.toTimeString().slice(0,8).replace(/:/g,'-')+'.csv';
-  let ok=false;
-  for(let attempt=1;attempt<=3&&!ok;attempt++){
-    try{const res=await sendToPipe(STATE.filename,STATE.csv);ok=!!(res&&res.ok);}catch(e){ok=false;}
-    if(!ok&&attempt<3)await new Promise(r=>setTimeout(r,1500*attempt));
-  }
-  showDebrief(ok);
+  STATE.uploadDone=false;
+  window.addEventListener('beforeunload',warnIfUploading);
+  STATE.uploadPromise=(async()=>{
+    let ok=false;
+    for(let attempt=1;attempt<=5&&!ok;attempt++){
+      try{const res=await sendToPipe(STATE.filename,STATE.csv);ok=!!(res&&res.ok);}catch(e){ok=false;}
+      if(!ok&&attempt<5)await new Promise(r=>setTimeout(r,1500*attempt));
+    }
+    STATE.uploadOk=ok;STATE.uploadDone=true;window.removeEventListener('beforeunload',warnIfUploading);return ok;
+  })();
+  showDebrief();
 }
-function showDebrief(saved){
-  document.getElementById('save-fail').style.display=saved?'none':'block';
+function warnIfUploading(e){if(!STATE.uploadDone){e.preventDefault();e.returnValue='';}}
+async function goToCredit(ev){
+  ev.preventDefault();const a=document.getElementById('credit-btn');if(a.dataset.busy)return;a.dataset.busy='1';
+  const b=a.querySelector('button');b.textContent='Please wait\u2026';
+  if(STATE.uploadPromise)await Promise.race([STATE.uploadPromise,new Promise(r=>setTimeout(r,20000))]);
+  window.removeEventListener('beforeunload',warnIfUploading);
+  window.location.href=a.href;
+}
+function showDebrief(){
   document.getElementById('item9-box').style.display=STATE.item9Flag?'block':'none';
   document.getElementById('debrief-total').textContent=STATE.totalScore;
   const tbody=document.getElementById('debrief-block-rows');tbody.innerHTML='';
@@ -1059,13 +1094,11 @@ function showDebrief(saved){
     document.getElementById('credit-auto').style.display='';document.getElementById('credit-manual').style.display='none';}
   showScreen('scr-debrief');
 }
-function downloadLocal(){
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([STATE.csv],{type:'text/csv;charset=utf-8;'}));
-  a.download=STATE.filename;document.body.appendChild(a);a.click();a.remove();
-}
 function sendToPipe(filename,csv){
-  return fetch('https://pipe.jspsych.org/api/data/',{method:'POST',headers:{'Content-Type':'application/json',Accept:'*/*'},keepalive:true,
-    body:JSON.stringify({experimentID:CONFIG.dataPipeId,filename:filename,data:csv})});
+  const body=JSON.stringify({experimentID:CONFIG.dataPipeId,filename:filename,data:csv});
+  // 'keepalive' lets small uploads finish even if the page closes, but browsers refuse keepalive requests over 64 KB,
+  // so it is used only for small files (e.g. the consent record), never for the main data file.
+  return fetch('https://pipe.jspsych.org/api/data/',{method:'POST',headers:{'Content-Type':'application/json',Accept:'*/*'},keepalive:body.length<60000,body});
 }
 function buildCSV(){
   const nav=typeof navigator!=='undefined'?navigator:{},scr=typeof screen!=='undefined'?screen:{};
@@ -1074,7 +1107,9 @@ function buildCSV(){
     viewport:(typeof window!=='undefined'&&window.innerWidth?window.innerWidth+'x'+window.innerHeight:''),
     screen_size:(scr.width?scr.width+'x'+scr.height:''),
     quiz_attempts:STATE.quizAttempts,score_total:STATE.totalScore,
-    age:STATE.demographics.age||'',gender:STATE.demographics.gender||'',english_first:STATE.demographics.english||'',education:STATE.demographics.education||'',
+    age:STATE.demographics.age||'',gender:STATE.demographics.gender||'',english_first:STATE.demographics.english||'',
+    diag_answered:STATE.demographics.diag_answered,diag_depression:STATE.demographics.diag_depression,diag_anxiety:STATE.demographics.diag_anxiety,diag_ocd:STATE.demographics.diag_ocd,
+    diag_none:STATE.demographics.diag_none,diag_not_sure:STATE.demographics.diag_not_sure,diag_prefer_not_to_say:STATE.demographics.diag_prefer_not_to_say,
     cfg_depth_sd_nonsymbolic:[1,2,3].map(d=>CONFIG.depthSD[d]).join('|'),cfg_sym_means:CONFIG.symMeans.join('|'),cfg_sym_sd:CONFIG.symSD,cfg_q_min_item_ms:CONFIG.qMinItemMs,cfg_planted_trials:CONFIG.plantedTrials,cfg_plant_margin:CONFIG.plantMargin,cfg_counterbalance_cost_order:CONFIG.counterbalanceCostOrder?1:0,
     cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,
     cfg_phq9_item9_included:CONFIG.includePHQ9Item9?1:0};
