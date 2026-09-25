@@ -110,9 +110,10 @@ textarea{max-width:100%;min-height:80px}
   <p>You will see a branching network with a <strong>starting location</strong> (blue circle) and 16 other locations for you to search.</p>
   <p>Each location hides a reward value. To reveal a value, <strong>click on it</strong>.</p>
   <p>You can only click locations <strong>next to already-revealed locations</strong>. These are highlighted in orange.</p>
-  <p>Once you have revealed the values of some locations, press the <strong>'Execute plan'</strong> button and then use your keyboard's <strong>arrow keys</strong> to move around and collect the reward values. Note that you can only move to revealed locations and can only move in one direction (you can't go back on yourself).</p>
-  <p>Note also that you don't have to navigate to the end of a path. Just click the <strong>'Stop here'</strong> button (or press the <strong>spacebar</strong>) when navigating if you would like to stop at your current location.</p>
-  <p>Your score equals <strong>the sum of the rewards along the path you took</strong>. You do not need to search every location.</p>
+  <p>When you are ready, press the <strong>'Execute plan'</strong> button and then use your keyboard's <strong>arrow keys</strong> to move from the start along the arrows. You can only move in one direction (you can't go back on yourself).</p>
+  <p><strong>You can move onto any location, whether or not you have revealed it.</strong> You collect the reward at every location you move onto &mdash; including hidden ones, whose rewards may be positive or negative. Revealing a location simply lets you see its reward before you decide where to go. You can press 'Execute plan' at any time, even before revealing anything.</p>
+  <p>You don't have to navigate to the end of a path. Just click the <strong>'Stop here'</strong> button (or press the <strong>spacebar</strong>) when navigating if you would like to stop at your current location.</p>
+  <p>Your score equals <strong>the sum of the rewards at every location you moved onto</strong>, whether or not you revealed them. You do not need to search every location.</p>
   <p><strong>Try to maximise your overall score</strong>.</p>
   <button onclick="showScreen('scr-practice-intro')">Continue to practice</button>
 </div>
@@ -140,10 +141,10 @@ textarea{max-width:100%;min-height:80px}
     <label><input type="radio" name="q1" value="a"> Moves you there</label>
     <label><input type="radio" name="q1" value="b"> Removes it</label>
     <label><input type="radio" name="q1" value="c"> Reveals the hidden reward</label></div>
-  <div class="quiz-q"><p>2. During execution, which locations can you move to?</p>
+  <div class="quiz-q"><p>2. During execution, which locations can you move onto?</p>
     <label><input type="radio" name="q2" value="a"> Only positive-reward locations</label>
-    <label><input type="radio" name="q2" value="b"> Any</label>
-    <label><input type="radio" name="q2" value="c"> Only revealed locations</label></div>
+    <label><input type="radio" name="q2" value="b"> Only locations I have revealed</label>
+    <label><input type="radio" name="q2" value="c"> Any location the arrows lead to, whether I have revealed it or not</label></div>
   <div class="quiz-q"><p>3. How do you navigate during execution?</p>
     <label><input type="radio" name="q3" value="a"> Arrow keys</label>
     <label><input type="radio" name="q3" value="b"> Click on the locations</label>
@@ -153,13 +154,17 @@ textarea{max-width:100%;min-height:80px}
     <label><input type="radio" name="q4" value="b"> Right-click</label>
     <label><input type="radio" name="q4" value="c"> Click the 'Stop here' button (or press the spacebar)</label></div>
   <div class="quiz-q"><p>5. Your trial score is:</p>
-    <label><input type="radio" name="q5" value="a"> The sum of the rewards along the path you took</label>
+    <label><input type="radio" name="q5" value="a"> The sum of the rewards at every location you moved onto, whether or not you revealed it</label>
     <label><input type="radio" name="q5" value="b"> Number of locations revealed</label>
-    <label><input type="radio" name="q5" value="c"> Reward at the final location only</label></div>
+    <label><input type="radio" name="q5" value="c"> The sum of the rewards you revealed</label></div>
   <div class="quiz-q"><p>6. How do you do well in this task?</p>
     <label><input type="radio" name="q6" value="a"> Complete the task as quickly as possible</label>
     <label><input type="radio" name="q6" value="b"> Click as many locations as possible</label>
     <label><input type="radio" name="q6" value="c"> Earn as many points as possible</label></div>
+  <div class="quiz-q"><p>7. What happens if you move onto a location that you did not reveal?</p>
+    <label><input type="radio" name="q7" value="a"> It counts as zero</label>
+    <label><input type="radio" name="q7" value="b"> You collect its hidden reward, which could be positive or negative</label>
+    <label><input type="radio" name="q7" value="c"> You can't &mdash; a location must be revealed before you can move onto it</label></div>
   <button id="btn-quiz-check" onclick="submitQuiz()">Check answers</button>
   <p class="err" id="quiz-err"></p>
   <button id="btn-quiz-continue" onclick="quizContinue()" style="display:none">Continue</button>
@@ -367,13 +372,10 @@ const CONFIG={
   // Symbolic blocks (as in the original task): CONSTANT variance. Each symbol has one fixed value wherever it appears.
   symMeans:[8,3,-3,-8],
   symSD:2,
-  // Pruning test (Huys et al., 2012): planted boards in BOTH symbol blocks where the best route (at zero cost)
-  // starts with the -8 symbol followed by +8, +8. Free block: walking through the loss is optimal.
-  // Costly block: the identical kind of board, where avoiding the loss is optimal (3 clicks x 5 points).
-  plantedTrials:4,          // per symbol block
-  plantedAfter:3,           // the first 3 trials of each symbol block are always ordinary (symbol learning)
-  plantMargin:5,            // loss route must beat every other route by at least this many expected points (at zero cost)
-  costlyClickCost:2,        // points per click in the costly blocks (chosen by simulation: at 2, searching one or two branches is worthwhile; at 3+ it never pays in the question-mark blocks)
+  costlyClickCost:2,        // points per click in the costly blocks. With free movement, walking without clicking earns 0 on average in the
+                            // question-mark blocks; revealing 3-4 outer locations then walking to the best one earns about +4.5 per trial at cost 2,
+                            // about +2 at cost 3 (revealing 2), and nothing at cost 5 (simulated), so at 2 searching still clearly pays.
+  freeMovement:true,        // execution may pass through locations not revealed during search (their hidden rewards are collected), as in Callaway et al.
   counterbalanceCostOrder:false, // false = fixed order (free then costly within each pair). true = random per participant.
   newSymbolsForCost5:true,  // true: block 4 uses a fresh symbol set (so the cost effect isn't carried by prior learning)
   includePHQ9Item9:false,   // PHQ-8 by default. If true, item 9 is asked and endorsers see a support box.
@@ -433,11 +435,6 @@ function drawSymbol(cx,sym,x,y,r,col){
 /* ============================================================
    SETUP (block order is fixed, as specified)
    ============================================================ */
-function makePlan(n){
-  const k=Math.min(CONFIG.plantedTrials,Math.max(0,n-CONFIG.plantedAfter));
-  const rest=shuffle(Array(k).fill('planted').concat(Array(n-CONFIG.plantedAfter-k).fill('standard')));
-  return Array(Math.min(CONFIG.plantedAfter,n)).fill('standard').concat(rest);
-}
 function submitPid(){
   const pid=document.getElementById('inp-pid').value.trim();
   if(!pid){document.getElementById('pid-err').textContent='Please enter your SONA participant ID.';return;}
@@ -453,11 +450,9 @@ function submitPid(){
   const nsPair=[mk('ns_free','none',0),mk('ns_costly','none',C)],syPair=[mk('sym_free','symbolic',0,sym0),mk('sym_costly','symbolic',C,sym5)];
   if(costlyFirst){nsPair.reverse();syPair.reverse();}
   STATE.blockDefs=nsPair.concat(syPair);
-  STATE.blockDefs.forEach(bd=>{bd.plan=bd.cueMode==='symbolic'?makePlan(bd.trials):Array(bd.trials).fill('standard');});
   STATE.qOrder=shuffle(['phq','gad','ius','oci']);
   const mapStr=sy=>sy.symbols.map(s=>symName(s)+'@'+sy.means[s]).join('|');
   STATE.cb={block_order:STATE.blockDefs.map(b=>b.id).join('>'),cost_order:costlyFirst?'costly_first':'free_first',costly_click_cost:C,
-    trial_plan_sym_free:STATE.blockDefs.find(b=>b.id==='sym_free').plan.join('|'),trial_plan_sym_costly:STATE.blockDefs.find(b=>b.id==='sym_costly').plan.join('|'),
     symbol_set_sym_free:sym0.set,symbol_set_sym_costly:sym5.set,
     symbol_values_sym_free:mapStr(sym0),symbol_values_sym_costly:mapStr(sym5),questionnaire_order:STATE.qOrder.join('>')};
   showScreen('scr-info');
@@ -477,7 +472,7 @@ function sendConsent(){
   sendToPipe(CONFIG.studyTag+'_p'+STATE.participantId+'_consent.csv',csv).catch(()=>{});
 }
 function submitQuiz(){
-  const ans={q1:'c',q2:'c',q3:'a',q4:'c',q5:'a',q6:'c'},e=document.getElementById('quiz-err');
+  const ans={q1:'c',q2:'c',q3:'a',q4:'c',q5:'a',q6:'c',q7:'b'},e=document.getElementById('quiz-err');
   if(Object.keys(ans).some(n=>!document.querySelector('input[name="'+n+'"]:checked'))){e.style.color='';e.textContent='Please answer every question.';return;}
   STATE.quizAttempts++;
   const pass=Object.entries(ans).every(([n,a])=>document.querySelector('input[name="'+n+'"]:checked').value===a);
@@ -487,7 +482,7 @@ function submitQuiz(){
 }
 function quizContinue(){document.getElementById('btn-quiz-continue').style.display='none';advanceToNextBlock();}
 document.addEventListener('change',ev=>{   // changing an answer after passing requires re-checking
-  if(ev.target&&ev.target.name&&/^q[1-6]$/.test(ev.target.name)&&document.getElementById('scr-quiz').classList.contains('active')){
+  if(ev.target&&ev.target.name&&/^q[1-7]$/.test(ev.target.name)&&document.getElementById('scr-quiz').classList.contains('active')){
     document.getElementById('btn-quiz-continue').style.display='none';document.getElementById('btn-quiz-check').style.display='';
     const e=document.getElementById('quiz-err');e.textContent='';e.style.color='';}
 });
@@ -497,51 +492,29 @@ document.addEventListener('change',ev=>{   // changing an answer after passing r
    ============================================================ */
 function symMean(bd,sym){return bd.means[sym]}
 function nodeMean(bd,cues,n){return bd.cueMode==='symbolic'?symMean(bd,cues[n]):0}
-/* Expected net value of each executable plan given the symbols and the click cost.
-   A plan = a route prefix of depth 1-3 (revealing exactly those nodes), or one click then stay at the start. */
+/* Expected value of each route given the symbols alone. With free movement no clicks are needed to follow a route,
+   so a plan = walk a route prefix of depth 0-3 without clicking (net = gross). Symbol SD is small (2), so the
+   information value of clicking is negligible and the zero-click plan is the benchmark. */
 function expOptions(bd,cues){
-  const c=bd.clickCost,opts=[{route:[0],gross:0,net:-c}],seen={};
+  const opts=[{route:[0],gross:0,net:0}],seen={};
   GRAPH.paths.forEach(p=>{for(let d=1;d<=3;d++){const r=p.slice(0,d+1),k=r.join('|');if(seen[k])continue;seen[k]=1;
-    let g=0;for(let i=1;i<r.length;i++)g+=nodeMean(bd,cues,r[i]);opts.push({route:r,gross:g,net:g-c*d});}});
+    let g=0;for(let i=1;i<r.length;i++)g+=nodeMean(bd,cues,r[i]);opts.push({route:r,gross:g,net:g});}});
   opts.sort((a,b)=>b.net-a.net||b.route.length-a.route.length);return opts;
 }
-function symWith(bd,v){return bd.symbols.find(s=>bd.means[s]===v)}
-function inSubtree(n,root){while(n!==null&&n!==undefined){if(n===root)return true;n=GRAPH.parent[n];}return false}
-/* Planted board: loss symbol (-8) next to the start, +8 behind it, +8 on one leaf; every other route is worse by >= plantMargin (zero cost). */
-function plantedCues(bd){
-  const L=symWith(bd,-8),Hi=symWith(bd,8),mid=bd.symbols.filter(s=>s!==L&&s!==Hi),notHi=bd.symbols.filter(s=>s!==Hi);
-  const free=Object.assign({},bd,{clickCost:0});
-  for(let tries=1;tries<=20000;tries++){
-    const c={0:''},lossNode=GRAPH.d1[randInt(4)];
-    for(let n=1;n<GRAPH.nodeCount;n++)c[n]=bd.symbols[randInt(bd.symbols.length)];
-    const others=[0,1,2].map(()=>mid[randInt(mid.length)]);   // +3 / -3 next to the start on the other branches
-    GRAPH.d1.filter(n=>n!==lossNode).forEach((n,i)=>{c[n]=others[i]});
-    c[lossNode]=L;const m=GRAPH.children[lossNode][0];c[m]=Hi;
-    const lv=shuffle(GRAPH.children[m]);c[lv[0]]=Hi;c[lv[1]]=notHi[randInt(notHi.length)];
-    const o=expOptions(free,c);
-    if(o[0].route.length===4&&o[0].route[1]===lossNode&&o[0].net-o[1].net>=CONFIG.plantMargin)return {cues:c,lossNode,tries};
-  }
-  return null;
-}
-function newTrial(bd,trialNum,globalNum,isPractice,type){
-  let cues={0:''},rewards={0:0},lossNode=null,planted=type==='planted',plantTries='';
+function newTrial(bd,trialNum,globalNum,isPractice){
+  let cues={0:''},rewards={0:0};
   if(bd.cueMode==='symbolic'){
-    const pc=planted?plantedCues(bd):null;
-    if(pc){cues=pc.cues;lossNode=pc.lossNode;plantTries=pc.tries;}
-    else{
-      if(planted)planted=false;   // fallback (never expected): ordinary board, flagged in the data
-      const d1=shuffle(bd.symbols);GRAPH.d1.forEach((n,i)=>{cues[n]=d1[i]});   // each symbol once at depth 1 (as original)
-      for(let n=1;n<GRAPH.nodeCount;n++){if(cues[n]===undefined)cues[n]=bd.symbols[randInt(bd.symbols.length)];}
-    }
+    const d1=shuffle(bd.symbols);GRAPH.d1.forEach((n,i)=>{cues[n]=d1[i]});   // each symbol once at depth 1 (as original)
+    for(let n=1;n<GRAPH.nodeCount;n++){if(cues[n]===undefined)cues[n]=bd.symbols[randInt(bd.symbols.length)];}
     for(let n=1;n<GRAPH.nodeCount;n++)rewards[n]=gaussInt(symMean(bd,cues[n]),CONFIG.symSD);
   }else{
     for(let n=1;n<GRAPH.nodeCount;n++){cues[n]='?';rewards[n]=gaussInt(0,CONFIG.depthSD[GRAPH.depth[n]]);}
   }
   const opts=bd.cueMode==='symbolic'?expOptions(bd,cues):null;
   return {bd,blockId:bd.id,trialNum,globalNum,isPractice,rewards,cues,
-    trialType:isPractice?'practice':(planted?'planted':'standard'),plantRequested:type==='planted'?1:0,plantTries,lossNode,
+    trialType:isPractice?'practice':'standard',
     expBest:opts?opts[0]:null,expSecond:opts?opts[1]:null,
-    revealed:{0:true},clicks:[],clickTimestamps:[],phase:'search',currentNode:0,route:[0],moveTimestamps:[],
+    revealed:{0:true},visited:{0:true},clicks:[],clickTimestamps:[],phase:'search',currentNode:0,route:[0],moveTimestamps:[],
     trialStartTime:ts(),executeTime:null,score:null};
 }
 
@@ -550,7 +523,7 @@ function newTrial(bd,trialNum,globalNum,isPractice,type){
    ============================================================ */
 function computePathValues(t){return GRAPH.paths.map(p=>{let v=0;for(let i=1;i<p.length;i++)v+=t.rewards[p[i]];return v})}
 function computeOptimalDepth(r,depth){let b=-Infinity,bp=null;GRAPH.paths.forEach(p=>{const sub=p.slice(0,depth+1);let v=0;for(let i=1;i<sub.length;i++)v+=r[sub[i]];if(v>b){b=v;bp=sub;}});return{score:b,path:bp}}
-function canExecute(t){for(let n=1;n<GRAPH.nodeCount;n++)if(t.revealed[n])return true;return false}
+function canExecute(t){return true}   // free movement: execution is allowed at any time, even with no clicks
 function getFrontier(t){if(t.phase!=='search')return[];const f=[];for(let n=0;n<GRAPH.nodeCount;n++){if(t.revealed[n])continue;if(GRAPH.parent[n]!==null&&t.revealed[GRAPH.parent[n]])f.push(n);}return f}
 
 function recordEvent(phase,evType,nid,trial,extra){
@@ -562,10 +535,9 @@ function recordEvent(phase,evType,nid,trial,extra){
   const row={sona_id:STATE.participantId,block_id:bd.id,block_number:trial.isPractice?0:STATE.currentBlockIdx+1,
     block_cue_mode:bd.cueMode,block_variance:bd.variance,block_symbol_set:bd.symbolSet,block_click_cost:bd.clickCost,
     trial_in_block:trial.trialNum,trial_global:trial.globalNum,is_practice:trial.isPractice?1:0,
-    trial_type:trial.trialType,loss_node:trial.lossNode===null?'':trial.lossNode,
-    node_in_loss_subtree:(hasNode&&trial.lossNode!==null)?(inSubtree(nid,trial.lossNode)?1:0):'',
+    trial_type:trial.trialType,
     phase,event_type:evType,event_timestamp_ms:ts(),event_time_in_trial_ms:ts()-trial.trialStartTime,
-    node_id:nid!==null?nid:'',node_depth:nid!==null?GRAPH.depth[nid]:'',node_value:(nid!==null&&trial.revealed[nid])?trial.rewards[nid]:'',
+    node_id:nid!==null?nid:'',node_depth:nid!==null?GRAPH.depth[nid]:'',node_value:(nid!==null&&(trial.revealed[nid]||trial.visited[nid]))?trial.rewards[nid]:'',
     node_cue:hasNode?symName(trial.cues[nid]):'',
     node_cue_mean:(hasNode&&bd.cueMode==='symbolic')?symMean(bd,trial.cues[nid]):'',
     node_on_exp_best_route:(hasNode&&trial.expBest)?(trial.expBest.route.includes(nid)?1:0):'',
@@ -589,7 +561,7 @@ function drawTrial(trial){
   ctx.setTransform(canvas.width/CW,0,0,canvas.height/CH,0,0);ctx.clearRect(0,0,CW,CH);const frontier=getFrontier(trial);
   for(const[p,kids]of Object.entries(GRAPH.children))for(const k of kids){const[x1,y1]=GRAPH.pos[p],[x2,y2]=GRAPH.pos[k];const dx=x2-x1,dy=y2-y1,l=Math.sqrt(dx*dx+dy*dy),ux=dx/l,uy=dy/l;const sx=x1+ux*NR,sy=y1+uy*NR,ex=x2-ux*NR,ey=y2-uy*NR;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.strokeStyle='#aaa';ctx.lineWidth=1.5;ctx.stroke();const h=8,a=Math.atan2(ey-sy,ex-sx);ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex-h*Math.cos(a-.4),ey-h*Math.sin(a-.4));ctx.lineTo(ex-h*Math.cos(a+.4),ey-h*Math.sin(a+.4));ctx.closePath();ctx.fillStyle='#aaa';ctx.fill();}
   for(let n=0;n<GRAPH.nodeCount;n++){
-    const[x,y]=GRAPH.pos[n];const rev=trial.revealed[n],click=frontier.includes(n),cur=(trial.phase==='execute'&&trial.currentNode===n),onR=(trial.phase==='done'&&trial.route.includes(n));
+    const[x,y]=GRAPH.pos[n];const rev=trial.revealed[n]||trial.visited[n],click=frontier.includes(n),cur=(trial.phase==='execute'&&trial.currentNode===n),onR=(trial.phase==='done'&&trial.route.includes(n));
     ctx.beginPath();ctx.arc(x,y,NR,0,Math.PI*2);
     if(cur)ctx.fillStyle='#2ecc71';else if(onR)ctx.fillStyle='#aed6f1';else if(n===0)ctx.fillStyle='#a9cce3';
     else if(rev)ctx.fillStyle='#e8f5e9';
@@ -602,7 +574,7 @@ function drawTrial(trial){
     else if(rev){const v=trial.rewards[n];ctx.font='bold 14px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#222';ctx.fillText(fmtV(v),x,y);}
     else{drawSymbol(ctx,trial.cues[n],x,y,13,(click&&trial.phase==='search')?'#8B4513':'#888');}
   }
-  if(trial.phase==='execute'){const moves=GRAPH.arrowMap[trial.currentNode];if(moves)for(const[d,t]of Object.entries(moves)){if(!trial.revealed[t])continue;const[tx,ty]=GRAPH.pos[t],[cx2,cy2]=GRAPH.pos[trial.currentNode];const mx=(cx2+tx)/2,my=(cy2+ty)/2,sz=7;ctx.beginPath();if(d==='ArrowUp'){ctx.moveTo(mx,my-sz);ctx.lineTo(mx-sz,my+sz);ctx.lineTo(mx+sz,my+sz);}else if(d==='ArrowDown'){ctx.moveTo(mx,my+sz);ctx.lineTo(mx-sz,my-sz);ctx.lineTo(mx+sz,my-sz);}else if(d==='ArrowLeft'){ctx.moveTo(mx-sz,my);ctx.lineTo(mx+sz,my-sz);ctx.lineTo(mx+sz,my+sz);}else{ctx.moveTo(mx+sz,my);ctx.lineTo(mx-sz,my-sz);ctx.lineTo(mx-sz,my+sz);}ctx.closePath();ctx.fillStyle='#2a5a8a';ctx.fill();}}
+  if(trial.phase==='execute'){const moves=GRAPH.arrowMap[trial.currentNode];if(moves)for(const[d,t]of Object.entries(moves)){const[tx,ty]=GRAPH.pos[t],[cx2,cy2]=GRAPH.pos[trial.currentNode];const mx=(cx2+tx)/2,my=(cy2+ty)/2,sz=7;ctx.beginPath();if(d==='ArrowUp'){ctx.moveTo(mx,my-sz);ctx.lineTo(mx-sz,my+sz);ctx.lineTo(mx+sz,my+sz);}else if(d==='ArrowDown'){ctx.moveTo(mx,my+sz);ctx.lineTo(mx-sz,my-sz);ctx.lineTo(mx+sz,my-sz);}else if(d==='ArrowLeft'){ctx.moveTo(mx-sz,my);ctx.lineTo(mx+sz,my-sz);ctx.lineTo(mx+sz,my+sz);}else{ctx.moveTo(mx+sz,my);ctx.lineTo(mx-sz,my-sz);ctx.lineTo(mx-sz,my+sz);}ctx.closePath();ctx.fillStyle='#2a5a8a';ctx.fill();}}
 }
 
 canvas.addEventListener('click',function(e){
@@ -640,10 +612,11 @@ document.addEventListener('keydown',function(e){
   const t=STATE.trial;if(!t||t.phase!=='execute')return;
   if(e.key===' '||e.key==='Spacebar'){e.preventDefault();recordEvent('execute','stop_here',t.currentNode,t,{stop_method:'spacebar'});endTrial();return;}
   const moves=GRAPH.arrowMap[t.currentNode];if(!moves||moves[e.key]===undefined)return;
-  e.preventDefault();const target=moves[e.key];if(!t.revealed[target])return;
-  t.currentNode=target;t.route.push(target);t.moveTimestamps.push(ts());recordEvent('execute','move',target,t,{});
-  const hasRevChild=GRAPH.children[target]&&GRAPH.children[target].some(c=>t.revealed[c]);
-  if(GRAPH.terminals.includes(target)||!hasRevChild)endTrial();else{drawTrial(t);updateStatus();}
+  e.preventDefault();const target=moves[e.key];   // free movement: revealed and unrevealed locations can both be entered
+  const wasRevealed=t.revealed[target]?1:0;
+  t.currentNode=target;t.route.push(target);t.visited[target]=true;t.moveTimestamps.push(ts());
+  recordEvent('execute','move',target,t,{node_was_revealed:wasRevealed});
+  if(GRAPH.terminals.includes(target))endTrial();else{drawTrial(t);updateStatus();}
 });
 
 function endTrial(){
@@ -658,7 +631,8 @@ function endTrial(){
   // --- derived search measures ---
   const routeNodes=t.route.slice(1);
   const onRoute=t.clicks.filter(n=>routeNodes.includes(n)).length;
-  const lastRouteClick=routeNodes.length?Math.max(...routeNodes.map(n=>t.clicks.indexOf(n))):-1;
+  const routeUnrev=routeNodes.filter(n=>!t.revealed[n]);   // locations walked through without having been revealed
+  const lastRouteClick=(routeNodes.length&&!routeUnrev.length)?Math.max(...routeNodes.map(n=>t.clicks.indexOf(n))):-1;
   const rv=routeNodes.map(n=>t.rewards[n]);
   const rvMean=rv.length?rv.reduce((a,b)=>a+b,0)/rv.length:0;
   const routeSD=rv.length>1?Math.sqrt(rv.reduce((a,b)=>a+(b-rvMean)**2,0)/(rv.length-1)):'';
@@ -668,7 +642,10 @@ function endTrial(){
     n_clicks:t.clicks.length,n_clicks_d1:byDepth(1),n_clicks_d2:byDepth(2),n_clicks_d3:byDepth(3),
     prop_nodes_revealed:Math.round(t.clicks.length/16*1000)/1000,
     n_clicks_on_route:onRoute,n_clicks_off_route:t.clicks.length-onRoute,
-    n_clicks_after_route_revealed:routeNodes.length?(t.clicks.length-1-lastRouteClick):'',
+    n_clicks_after_route_revealed:(routeNodes.length&&!routeUnrev.length)?(t.clicks.length-1-lastRouteClick):'',   // blank if the route was not fully revealed
+    n_route_unrevealed:routeUnrev.length,route_unrevealed_nodes:routeUnrev.join('|'),
+    route_fully_revealed:routeUnrev.length?0:1,route_unrevealed_reward:routeUnrev.reduce((a,n)=>a+t.rewards[n],0),
+    executed_without_clicking:t.clicks.length?0:1,
     route_value_sd:routeSD===''?'':Math.round(routeSD*100)/100,
     route_depth:t.route.length-1,search_breadth:sb,max_search_depth:md,
     first_click_depth:firstDepth,
@@ -687,29 +664,8 @@ function endTrial(){
       exp_margin:t.expBest.net-t.expSecond.net,
       chose_exp_best_route:t.route.join('|')===t.expBest.route.join('|')?1:0,
       route_exp_gross:routeExpGross,route_exp_net_given_clicks:expNetGivenClicks,
-      exp_shortfall:t.expBest.net-expNetGivenClicks,
-      excess_clicks:t.clicks.length-Math.max(1,t.expBest.route.length-1)});
+      exp_shortfall:t.expBest.net-expNetGivenClicks});
   }
-  if(t.lossNode!==null){   // planted trials: pruning measures
-    const L=t.lossNode,m=GRAPH.children[L][0],lossRoute=[0,L,m].concat(GRAPH.children[m]);
-    const lossGross=nodeMean(bd,t.cues,L)+nodeMean(bd,t.cues,m)+Math.max(...GRAPH.children[m].map(n=>nodeMean(bd,t.cues,n)));
-    const free=Object.assign({},bd,{clickCost:0}),fo=expOptions(free,t.cues),bestAlt=fo.find(o=>o.route[1]!==L);
-    // best route on the values actually revealed at the moment of execution (only fully revealed routes/prefixes count)
-    let revBest=-Infinity,revBestThroughLoss=0;
-    GRAPH.paths.forEach(pth=>{for(let d=1;d<=3;d++){const r=pth.slice(0,d+1);if(!r.slice(1).every(n=>t.revealed[n]))break;
-      const v=r.slice(1).reduce((a,n)=>a+t.rewards[n],0);if(v>revBest){revBest=v;revBestThroughLoss=r[1]===L?1:0;}}});
-    Object.assign(extra,{
-      loss_route_exp_gross:lossGross,best_alt_exp_gross:bestAlt?bestAlt.gross:'',
-      loss_route_optimal_at_block_cost:t.expBest&&t.expBest.route[1]===L?1:0,
-      loss_node_revealed:t.revealed[L]?1:0,
-      loss_subtree_expanded:(t.revealed[m])?1:0,
-      n_clicks_in_loss_subtree:t.clicks.filter(n=>inSubtree(n,L)&&n!==L).length,
-      route_through_loss:t.route.includes(L)?1:0,
-      route_reached_loss_leaf:t.route.length===4&&t.route[1]===L?1:0,
-      revealed_best_through_loss:revBest===-Infinity?'':revBestThroughLoss,
-      plant_tries:t.plantTries});
-  }
-  if(t.plantRequested&&t.lossNode===null)extra.plant_failed=1;
   recordEvent('terminate','end_trial',null,t,extra);
   drawTrial(t);
   document.getElementById('task-status').innerHTML='<span class="phase-label phase-done">Trial complete</span> '+(cost>0?'Path: '+fmtV(pathReward)+' − '+cc+' click cost = <strong>'+fmtV(t.score)+'</strong>':'Path total: <strong>'+fmtV(t.score)+'</strong>');
@@ -718,8 +674,8 @@ function endTrial(){
 }
 function updateStatus(){
   const t=STATE.trial,el=document.getElementById('task-status'),cost=t.bd.clickCost;
-  if(t.phase==='search')el.innerHTML='<span class="phase-label phase-plan">Search</span> Click locations to reveal their values'+(cost>0?' (<strong>each click costs '+cost+' points</strong>)':'')+'. Clicks: '+t.clicks.length;
-  else if(t.phase==='execute')el.innerHTML='<span class="phase-label phase-act">Execute</span> Use <strong>arrow keys</strong> to navigate. Click <strong>Stop here</strong> (or press the spacebar) if you would like to stop at your current location.';
+  if(t.phase==='search')el.innerHTML='<span class="phase-label phase-plan">Search</span> Click locations to reveal their values'+(cost>0?' (<strong>each click costs '+cost+' points</strong>)':'')+', then press <strong>Execute plan</strong> when you are ready. Clicks: '+t.clicks.length;
+  else if(t.phase==='execute')el.innerHTML='<span class="phase-label phase-act">Execute</span> Use <strong>arrow keys</strong> to navigate. You can move onto any location, revealed or not &mdash; you collect its reward either way. Click <strong>Stop here</strong> (or press the spacebar) if you would like to stop at your current location.';
 }
 
 /* ============================================================
@@ -734,7 +690,7 @@ function nextTrial(){
     const c=CONFIG.practiceCosts[STATE.currentTrialInBlock-1];
     bd={id:'practice',cueMode:'none',variance:'increasing',clickCost:c,symbols:null,symbolSet:'',means:null};
     STATE.globalTrialNum++;
-    STATE.trial=newTrial(bd,STATE.currentTrialInBlock,STATE.globalTrialNum,true,'practice');
+    STATE.trial=newTrial(bd,STATE.currentTrialInBlock,STATE.globalTrialNum,true);
     document.getElementById('task-block-label').textContent='Practice '+STATE.currentTrialInBlock+'/'+CONFIG.practiceCosts.length+(c>0?' — each click costs '+c+' points':'');
     document.getElementById('task-score-box').style.display='none';
   }else{
@@ -742,12 +698,12 @@ function nextTrial(){
     STATE.currentTrialInBlock++;
     if(STATE.currentTrialInBlock>bd.trials){STATE.trial=null;afterBlock();return;}
     STATE.globalTrialNum++;
-    STATE.trial=newTrial(bd,STATE.currentTrialInBlock,STATE.globalTrialNum,false,bd.plan[STATE.currentTrialInBlock-1]);
+    STATE.trial=newTrial(bd,STATE.currentTrialInBlock,STATE.globalTrialNum,false);
     document.getElementById('task-block-label').textContent='Block '+(STATE.currentBlockIdx+1)+' of '+STATE.blockDefs.length+' — Trial '+STATE.currentTrialInBlock+'/'+bd.trials+(bd.clickCost>0?' — each click costs '+bd.clickCost+' points':'');
     document.getElementById('task-score-box').style.display='inline-block';
     document.getElementById('task-score-box').textContent='Score: '+(STATE.blockScores[bd.id]||0);
   }
-  showScreen('scr-task');document.getElementById('btn-execute').style.display='none';document.getElementById('btn-stop').style.display='none';
+  showScreen('scr-task');document.getElementById('btn-execute').style.display='inline-block';document.getElementById('btn-stop').style.display='none';
   updateCostBox(STATE.trial,false);
   drawTrial(STATE.trial);updateStatus();sizeCanvas();
 }
@@ -771,7 +727,7 @@ function advanceToNextBlock(){
       'A red counter at the top of the screen will show how many points your clicks have cost on each trial.</p></div>'+desc;
   else if(seenCost&&prev.clickCost!==bd.clickCost)
     desc='<div class="free-notice">The cost of a click is changing: clicks are now free.</div>'+desc;
-  desc+='<p>Click locations to reveal values'+(bd.clickCost===0?(seenCost?' (<strong>free</strong>)':''):' (<strong>&minus;'+bd.clickCost+' points per click</strong>)')+', then press \'Execute plan\' and navigate using the arrow keys on your keyboard to collect revealed values. If you want to stop collecting values early, click \'Stop here\' (or press the spacebar).</p>';
+  desc+='<p>Click locations to reveal values'+(bd.clickCost===0?(seenCost?' (<strong>free</strong>)':''):' (<strong>&minus;'+bd.clickCost+' points per click</strong>)')+', then press \'Execute plan\' and navigate using the arrow keys on your keyboard. <strong>You can move onto any location, whether or not you revealed it, and you collect the reward of every location you move onto.</strong> If you want to stop early, click \'Stop here\' (or press the spacebar).</p>';
   desc+='<p>There are <strong>'+bd.trials+' trials</strong> in this block.</p>';
   document.getElementById('block-intro-text').innerHTML=desc;
   const symAns=bd.cueMode!=='symbolic'?'qmarks':((!prev||prev.cueMode!=='symbolic'||prev.symbolSet!==bd.symbolSet)?'new_symbols':'same_symbols');
@@ -784,6 +740,9 @@ function advanceToNextBlock(){
   if(bd.clickCost>0)
     Q.push({name:'bq_unvisited',text:'Do locations that you reveal but do not visit still cost points?',answer:'yes',
       opts:[['yes','Yes &mdash; every click costs points'],['no','No &mdash; only the locations on my path cost points']]});
+  if(bd.clickCost>0)
+    Q.push({name:'bq_move_unrevealed',text:'Do you have to reveal a location before you can move onto it?',answer:'no',
+      opts:[['yes','Yes &mdash; I can only move onto locations I have revealed'],['no','No &mdash; I can move onto any location, and I collect its reward whether or not I revealed it']]});
   if(bd.cueMode==='symbolic')
     Q.push({name:'bcs',text:'What will the locations show in this block?',answer:symAns,
       opts:[['qmarks','Question marks'],['new_symbols','Symbols I have not seen before'],['same_symbols','The same symbols as the previous block']]});
@@ -1110,8 +1069,8 @@ function buildCSV(){
     age:STATE.demographics.age||'',gender:STATE.demographics.gender||'',english_first:STATE.demographics.english||'',
     diag_answered:STATE.demographics.diag_answered,diag_depression:STATE.demographics.diag_depression,diag_anxiety:STATE.demographics.diag_anxiety,diag_ocd:STATE.demographics.diag_ocd,
     diag_none:STATE.demographics.diag_none,diag_not_sure:STATE.demographics.diag_not_sure,diag_prefer_not_to_say:STATE.demographics.diag_prefer_not_to_say,
-    cfg_depth_sd_nonsymbolic:[1,2,3].map(d=>CONFIG.depthSD[d]).join('|'),cfg_sym_means:CONFIG.symMeans.join('|'),cfg_sym_sd:CONFIG.symSD,cfg_q_min_item_ms:CONFIG.qMinItemMs,cfg_planted_trials:CONFIG.plantedTrials,cfg_plant_margin:CONFIG.plantMargin,cfg_counterbalance_cost_order:CONFIG.counterbalanceCostOrder?1:0,
-    cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,
+    cfg_depth_sd_nonsymbolic:[1,2,3].map(d=>CONFIG.depthSD[d]).join('|'),cfg_sym_means:CONFIG.symMeans.join('|'),cfg_sym_sd:CONFIG.symSD,cfg_q_min_item_ms:CONFIG.qMinItemMs,cfg_counterbalance_cost_order:CONFIG.counterbalanceCostOrder?1:0,
+    cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,cfg_free_movement:CONFIG.freeMovement?1:0,
     cfg_phq9_item9_included:CONFIG.includePHQ9Item9?1:0};
   Object.assign(pd,STATE.cb);
   STATE.blockDefs.forEach((bd,i)=>{pd['score_'+bd.id]=STATE.blockScores[bd.id]||0;pd['block_cc_errors_'+bd.id]=STATE.blockCCErrors[bd.id]||0;pd['block_cc_attempts_'+bd.id]=STATE.blockCCAttempts[bd.id]||0;});
@@ -1132,10 +1091,10 @@ function buildCSV(){
   const rows=STATE.events.map(e=>Object.assign({},e,pd));
   if(!rows.length)rows.push(Object.assign({sona_id:STATE.participantId},pd));
   const lead=['session_datetime','sona_id','recruitment_source','block_id','block_number','block_cue_mode','block_variance','block_symbol_set','block_click_cost','trial_in_block','trial_global',
-    'is_practice','trial_type','loss_node','phase','event_type','event_timestamp_ms','event_time_in_trial_ms','node_id','node_depth','node_value','node_cue',
+    'is_practice','trial_type','phase','event_type','event_timestamp_ms','event_time_in_trial_ms','node_id','node_depth','node_value','node_cue',
     'node_cue_mean','node_on_exp_best_route','click_number','route','route_values','path_reward','click_cost','trial_score',
     'n_clicks','n_clicks_d1','n_clicks_d2','n_clicks_d3','prop_nodes_revealed','first_click_depth','n_clicks_on_route','n_clicks_off_route',
-    'n_clicks_after_route_revealed','excess_clicks','route_through_loss','loss_subtree_expanded','n_clicks_in_loss_subtree','loss_route_optimal_at_block_cost','revealed_best_through_loss','exp_best_route','exp_best_net','exp_second_net','exp_margin','chose_exp_best_route','exp_shortfall',
+    'n_clicks_after_route_revealed','n_route_unrevealed','route_unrevealed_reward','executed_without_clicking','exp_best_route','exp_best_net','exp_second_net','exp_margin','chose_exp_best_route','exp_shortfall',
     'score_total','phq8_total','phq9_total','gad7_total','ius12_total','ius12_prospective','ius12_inhibitory','ocir_total','ocir_checking','attention_checks_passed'];
   const ks=new Set();rows.forEach(r=>Object.keys(r).forEach(k=>ks.add(k)));
   const keys=[...lead.filter(k=>ks.has(k)),...[...ks].filter(k=>!lead.includes(k))];
