@@ -73,11 +73,11 @@ textarea{max-width:100%;min-height:80px}
   <h1>Information sheet</h1>
   <p>You are invited to take part in a research study. Please read the description carefully. If you are happy to participate, click the 'Continue' button at the bottom of the page.</p>
   <h2>What is the purpose of this study?</h2>
-  <p>This study will help us understand how people search for information and make decisions under uncertainty, and how this relates to everyday experiences of mood, worry, anxiety and habits such as checking. Improving our understanding of these processes could have implications for education, health, and everyday decision-making.</p>
+  <p>This study will help us understand how people search for information and make decisions under uncertainty, and how this relates to everyday experiences of anxiety, worry and mood. Improving our understanding of these processes could have implications for education, health, and everyday decision-making.</p>
   <h2>What is involved in the study?</h2>
-  <p>To start, we will explain a decision-making task and ask a few comprehension questions so that we can be sure you understand the task before you begin. You will then complete four blocks of the task. After some blocks we will ask a few short questions about what you learned. Finally, you will complete four short questionnaires about your mood, worry, everyday habits (such as checking) and how you respond to uncertainty, and some optional demographic questions. The whole study should take approximately 25 minutes.</p>
+  <p>To start, we will explain a decision-making task and ask a few comprehension questions so that we can be sure you understand the task before you begin. You will then complete four blocks of the task. After some blocks we will ask a few short questions about what you learned. Finally, you will complete two short questionnaires about how you generally feel (including anxiety, worry and mood), and some optional demographic questions. The whole study should take approximately 25 minutes.</p>
   <h2>Are there any risks or disadvantages?</h2>
-  <p>The questionnaires ask about things such as low mood, sleep, worry and anxiety over the last two weeks, which some people may find uncomfortable. You can stop at any time. The questionnaires are not a diagnostic assessment, and because your answers are anonymised we cannot give you feedback on them or contact you about them. Details of organisations that offer free, confidential support are provided at the end of the study.</p>
+  <p>The questionnaires ask about things such as anxiety, worry, low mood and physical feelings of anxiety (for example, a racing heart), which some people may find uncomfortable. You can stop at any time. The questionnaires are not a diagnostic assessment, and because your answers are anonymised we cannot give you feedback on them or contact you about them. Details of organisations that offer free, confidential support are provided at the end of the study.</p>
   <h2>What will I receive for taking part?</h2>
   <p>You will receive course credit through SONA for taking part. In addition, <strong>each point you earn buys you a raffle ticket that enters you into a draw for a &pound;25 Amazon voucher</strong>. Please try to earn as many points as you can in the task.</p>
   <h2>What if I don't want to take part?</h2>
@@ -100,7 +100,7 @@ textarea{max-width:100%;min-height:80px}
   <div class="consent-item"><input type="checkbox" id="c2"><span>I understand that my participation is voluntary and I can withdraw at any time.</span></div>
   <div class="consent-item"><input type="checkbox" id="c3"><span>I understand my data will be anonymised and handled in accordance with UK GDPR.</span></div>
   <div class="consent-item"><input type="checkbox" id="c4"><span>I consent to my anonymised data being shared in open-access repositories.</span></div>
-  <div class="consent-item"><input type="checkbox" id="c6"><span>I understand that I will be asked questions about my mood, worry, anxiety and everyday habits, that these are not a diagnostic assessment, and that I will not receive individual feedback on my answers.</span></div>
+  <div class="consent-item"><input type="checkbox" id="c6"><span>I understand that I will be asked questions about anxiety, worry and mood, that these are not a diagnostic assessment, and that I will not receive individual feedback on my answers.</span></div>
   <div class="consent-item"><input type="checkbox" id="c5"><span>I agree to take part in this study.</span></div>
   <div class="form-row mt"><label>Digital signature (initials)</label><input type="text" id="inp-sig" maxlength="10"></div>
   <p class="err" id="consent-err"></p><button onclick="submitConsent()">I consent — continue</button>
@@ -255,7 +255,7 @@ textarea{max-width:100%;min-height:80px}
 <div class="screen" id="scr-q-intro">
   <h1>Some questions about you</h1>
   <p>That is the end of the task. Thank you.</p>
-  <p>Next there are <strong>four short questionnaires</strong> about your mood, worry, everyday habits, and how you tend to respond to uncertainty. They take about seven minutes in total.</p>
+  <p>Next there are <strong>two short questionnaires</strong> about how you generally feel. They take about five minutes in total.</p>
   <p>There are no right or wrong answers. Please answer each question honestly, based on how you have actually been feeling. Your answers do not affect your score.</p>
   <div class="note"><p style="margin:0">Some of these questions ask about difficult feelings. If you find this uncomfortable you can stop at any time. Details of free, confidential support are given at the end of the study.</p></div>
   <button onclick="startQuestionnaires()">Continue</button>
@@ -295,14 +295,11 @@ textarea{max-width:100%;min-height:80px}
 <!-- ================= DEBRIEF ================= -->
 <div class="screen" id="scr-debrief">
   <h1>Debriefing</h1>
-  <div id="item9-box" class="alert" style="display:none">
-    <p style="margin:0"><strong>Please look after yourself.</strong> One of your answers suggested you may have had thoughts that you would be better off dead, or of hurting yourself. Because your answers are anonymous we cannot contact you, so please consider talking to someone today. You can call the <strong>Student Wellbeing Helpline free on 0800 028 3766</strong> or <strong>Samaritans free on 116 123</strong> at any time, or text <strong>SHOUT to 85258</strong>. If you are in immediate danger, call <strong>999</strong>.</p>
-  </div>
   <p>Thank you for completing this study. The total number of points you earned is <strong id="debrief-total"></strong>.</p>
   <p>Below is a breakdown of points by block.</p>
   <table style="border-collapse:collapse;margin:12px 0;max-width:400px"><thead><tr><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Block</th><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Points</th></tr></thead><tbody id="debrief-block-rows"></tbody></table>
   <div class="credit-box"><p style="margin:0">Your responses have been saved.</p></div>
-  <p>Understanding agentic behaviour is at the frontier of cognitive neuroscience. This study investigated how people search for information and make decisions under uncertainty &mdash; for example, how much they check before committing, and how this changes when information is free or costly &mdash; and whether these patterns relate to everyday experiences of low mood, worry, anxiety and repetitive habits such as checking. The questionnaires you completed are widely used research measures; they are not a diagnosis.</p>
+  <p>Understanding agentic behaviour is at the frontier of cognitive neuroscience. This study investigated how people search for information and make decisions under uncertainty &mdash; for example, how much they check before committing, and how this changes when information is free or costly &mdash; and whether these patterns relate to everyday experiences of anxiety (including its physical and cognitive aspects) and low mood. The questionnaires you completed are widely used research measures; they are not a diagnosis.</p>
 
   <div class="support">
     <h2>Support</h2>
@@ -370,7 +367,6 @@ const CONFIG={
   freeMovement:true,        // execution may pass through locations not revealed during search (their hidden rewards are collected), as in Callaway et al.
   counterbalanceCostOrder:false, // false = fixed order (free then costly within each pair). true = random per participant.
   newSymbolsForCost5:true,  // true: block 4 uses a fresh symbol set (so the cost effect isn't carried by prior learning)
-  includePHQ9Item9:false,   // PHQ-8 by default. If true, item 9 is asked and endorsers see a support box.
   qMinItemMs:1300,           // questionnaire answer buttons are inactive for this long after each item appears
   dataPipeId:'5HYh2n8mS8O8',          // DataPipe experiment ID (DataPipe saves the files to the Google Drive linked to this experiment)
   // SONA: set the study URL in SONA to  ...task.html?id=%SURVEY_CODE%
@@ -395,7 +391,7 @@ const symName=s=>SYM_SAFE[s]||s;
 function ts(){return Date.now()}
 const STATE={participantId:'',consentTimestamp:'',quizAttempts:0,globalTrialNum:0,currentBlockIdx:-1,currentTrialInBlock:0,
   isPractice:false,trial:null,blockDefs:[],events:[],valEstData:[],pairedChoiceData:[],
-  cb:{},blockCCErrors:{},blockCCAttempts:{},blockRatings:[],qOrder:[],qi:0,q:{},demographics:{},totalScore:0,blockScores:{},item9Flag:false,
+  cb:{},blockCCErrors:{},blockCCAttempts:{},blockRatings:[],qOrder:[],qi:0,q:{},demographics:{},totalScore:0,blockScores:{},
   studyT0:ts(),csv:'',filename:'',sonaFromUrl:false};
 function readSonaId(){
   const P=new URLSearchParams(window.location.search||'');
@@ -441,7 +437,7 @@ function submitPid(){
   const nsPair=[mk('ns_free','none',0),mk('ns_costly','none',C)],syPair=[mk('sym_free','symbolic',0,sym0),mk('sym_costly','symbolic',C,sym5)];
   if(costlyFirst){nsPair.reverse();syPair.reverse();}
   STATE.blockDefs=nsPair.concat(syPair);
-  STATE.qOrder=shuffle(['phq','gad','ius','oci']);
+  STATE.qOrder=['stai','sticsa'];   // STAI-T then STICSA-T, as in Bari & Gershman (2025)
   const mapStr=sy=>sy.symbols.map(s=>symName(s)+'@'+sy.means[s]).join('|');
   STATE.cb={block_order:STATE.blockDefs.map(b=>b.id).join('>'),cost_order:costlyFirst?'costly_first':'free_first',costly_click_cost:C,
     symbol_set_sym_free:sym0.set,symbol_set_sym_costly:sym5.set,
@@ -834,73 +830,67 @@ function submitPairConf(){
 }
 
 /* ============================================================
-   QUESTIONNAIRES: PHQ-8 (optionally PHQ-9), GAD-7, IUS-12
+   QUESTIONNAIRES: STAI-T (Form Y-2), STICSA-T
+   STAI-T and STICSA-T are administered and coded as in Bari & Gershman (2025, Computational Psychiatry):
+   STAI-T then STICSA-T (41 items), each item coded 1-4 with 4 = high anxiety; the nine anxiety-absent STAI
+   items are reverse-coded. STAI item numbers here are 1-20 (Form Y-2 items 21-40). The four Fan et al. (2023)
+   factors (somatic anxiety, cognitive anxiety, negative affect, low self-esteem) are computed at analysis
+   (Bartlett scores from the published loadings), not in the browser. Attention-check items are extra and are
+   excluded from every score.
    ============================================================ */
-const RESP_2WK=['Not at all','Several days','More than half the days','Nearly every day'];
-const RESP_IUS=['Not at all characteristic of me','A little characteristic of me','Somewhat characteristic of me','Very characteristic of me','Entirely characteristic of me'];
-const STEM_2WK='Over the <strong>last 2 weeks</strong>, how often have you been bothered by any of the following problems?';
+const STAI_REVERSE=[1,3,6,7,10,13,14,16,19];                 // anxiety-absent items (Form Y-2 items 21,23,26,27,30,33,34,36,39)
+const STICSA_SOMATIC=[1,2,6,7,8,12,14,15,18,20,21],STICSA_COGNITIVE=[3,4,5,9,10,11,13,16,17,19];
 function buildQDefs(){
-  const phq=[
-    {id:'phq1',text:'Little interest or pleasure in doing things'},
-    {id:'phq2',text:'Feeling down, depressed, or hopeless'},
-    {id:'phq3',text:'Trouble falling or staying asleep, or sleeping too much'},
-    {id:'phq4',text:'Feeling tired or having little energy'},
-    {id:'phq5',text:'Poor appetite or overeating'},
-    {id:'attn_phq',text:'To show that you are reading carefully, please select \u201cMore than half the days\u201d for this item.',attn:2},
-    {id:'phq6',text:'Feeling bad about yourself \u2014 or that you are a failure or have let yourself or your family down'},
-    {id:'phq7',text:'Trouble concentrating on things, such as reading the newspaper or watching television'},
-    {id:'phq8',text:'Moving or speaking so slowly that other people could have noticed? Or the opposite \u2014 being so fidgety or restless that you have been moving around a lot more than usual'}];
-  if(CONFIG.includePHQ9Item9)phq.push({id:'phq9',text:'Thoughts that you would be better off dead, or of hurting yourself in some way'});
-  const gad=[
-    {id:'gad1',text:'Feeling nervous, anxious, or on edge'},
-    {id:'gad2',text:'Not being able to stop or control worrying'},
-    {id:'gad3',text:'Worrying too much about different things'},
-    {id:'gad4',text:'Trouble relaxing'},
-    {id:'attn_gad',text:'To show that you are reading carefully, please select \u201cSeveral days\u201d for this item.',attn:1},
-    {id:'gad5',text:'Being so restless that it is hard to sit still'},
-    {id:'gad6',text:'Becoming easily annoyed or irritable'},
-    {id:'gad7',text:'Feeling afraid, as if something awful might happen'}];
-  const STEM_GAD='Over the <strong>last 2 weeks</strong>, how often have you been bothered by the following problems?';
-  const ius=[
-    {id:'ius1',text:'Unforeseen events upset me greatly.',sub:'P'},
-    {id:'ius2',text:'It frustrates me not having all the information I need.',sub:'P'},
-    {id:'ius3',text:'Uncertainty keeps me from living a full life.',sub:'I'},
-    {id:'ius4',text:'One should always look ahead so as to avoid surprises.',sub:'P'},
-    {id:'ius5',text:'A small unforeseen event can spoil everything, even with the best of planning.',sub:'P'},
-    {id:'ius6',text:'When it\u2019s time to act, uncertainty paralyses me.',sub:'I'},
-    {id:'ius7',text:'When I am uncertain I can\u2019t function very well.',sub:'I'},
-    {id:'attn_ius',text:'To show that you are reading carefully, please select \u201cSomewhat characteristic of me\u201d for this item.',attn:3},
-    {id:'ius8',text:'I always want to know what the future has in store for me.',sub:'P'},
-    {id:'ius9',text:'I can\u2019t stand being taken by surprise.',sub:'P'},
-    {id:'ius10',text:'The smallest doubt can stop me from acting.',sub:'I'},
-    {id:'ius11',text:'I should be able to organise everything in advance.',sub:'P'},
-    {id:'ius12',text:'I must get away from all uncertain situations.',sub:'I'}];
-  const oci=[
-    {id:'oci1',text:'I have saved up so many things that they get in the way.',sub:'hoarding'},
-    {id:'oci2',text:'I check things more often than necessary.',sub:'checking'},
-    {id:'oci3',text:'I get upset if objects are not arranged properly.',sub:'ordering'},
-    {id:'oci4',text:'I feel compelled to count while I am doing things.',sub:'neutralising'},
-    {id:'oci5',text:'I find it difficult to touch an object when I know it has been touched by strangers or certain people.',sub:'washing'},
-    {id:'oci6',text:'I find it difficult to control my own thoughts.',sub:'obsessing'},
-    {id:'oci7',text:'I collect things I don\u2019t need.',sub:'hoarding'},
-    {id:'oci8',text:'I repeatedly check doors, windows, drawers, etc.',sub:'checking'},
-    {id:'oci9',text:'I get upset if others change the way I have arranged things.',sub:'ordering'},
-    {id:'attn_oci',text:'To show that you are reading carefully, please select \u201cA lot\u201d for this item.',attn:3},
-    {id:'oci10',text:'I feel I have to repeat certain numbers.',sub:'neutralising'},
-    {id:'oci11',text:'I sometimes have to wash or clean myself simply because I feel contaminated.',sub:'washing'},
-    {id:'oci12',text:'I am upset by unpleasant thoughts that come into my mind against my will.',sub:'obsessing'},
-    {id:'oci13',text:'I avoid throwing things away because I am afraid I might need them later.',sub:'hoarding'},
-    {id:'oci14',text:'I repeatedly check gas and water taps and light switches after turning them off.',sub:'checking'},
-    {id:'oci15',text:'I need things to be arranged in a particular way.',sub:'ordering'},
-    {id:'oci16',text:'I feel that there are good and bad numbers.',sub:'neutralising'},
-    {id:'oci17',text:'I wash my hands more often and longer than necessary.',sub:'washing'},
-    {id:'oci18',text:'I frequently get nasty thoughts and have difficulty in getting rid of them.',sub:'obsessing'}];
+  const stai=[
+    {id:'stai1',text:'I feel pleasant'},
+    {id:'stai2',text:'I feel nervous and restless'},
+    {id:'stai3',text:'I feel satisfied with myself'},
+    {id:'stai4',text:'I wish I could be as happy as others seem to be'},
+    {id:'stai5',text:'I feel like a failure'},
+    {id:'stai6',text:'I feel rested'},
+    {id:'stai7',text:'I am “calm, cool, and collected”'},
+    {id:'stai8',text:'I feel that difficulties are piling up so that I cannot overcome them'},
+    {id:'stai9',text:'I worry too much over something that really doesn’t matter'},
+    {id:'stai10',text:'I am happy'},
+    {id:'attn_stai',text:'To show that you are reading carefully, please select “Often” for this item.',attn:3},
+    {id:'stai11',text:'I have disturbing thoughts'},
+    {id:'stai12',text:'I lack self-confidence'},
+    {id:'stai13',text:'I feel secure'},
+    {id:'stai14',text:'I make decisions easily'},
+    {id:'stai15',text:'I feel inadequate'},
+    {id:'stai16',text:'I am content'},
+    {id:'stai17',text:'Some unimportant thought runs through my mind and bothers me'},
+    {id:'stai18',text:'I take disappointments so keenly that I can’t put them out of my mind'},
+    {id:'stai19',text:'I am a steady person'},
+    {id:'stai20',text:'I get in a state of tension or turmoil as I think over my recent concerns and interests'}];
+  const sticsa=[
+    {id:'sticsa1',text:'My heart beats fast'},
+    {id:'sticsa2',text:'My muscles are tense'},
+    {id:'sticsa3',text:'I feel agonized over my problems'},
+    {id:'sticsa4',text:'I think that others won’t approve of me'},
+    {id:'sticsa5',text:'I feel like I’m missing out on things because I can’t make up my mind soon enough'},
+    {id:'sticsa6',text:'I feel dizzy'},
+    {id:'sticsa7',text:'My muscles feel weak'},
+    {id:'sticsa8',text:'I feel trembly and shaky'},
+    {id:'sticsa9',text:'I picture some future misfortune'},
+    {id:'sticsa10',text:'I can’t get some thought out of my mind'},
+    {id:'sticsa11',text:'I have trouble remembering things'},
+    {id:'attn_sticsa',text:'To show that you are reading carefully, please select “A little” for this item.',attn:2},
+    {id:'sticsa12',text:'My face feels hot'},
+    {id:'sticsa13',text:'I think that the worst will happen'},
+    {id:'sticsa14',text:'My arms and legs feel stiff'},
+    {id:'sticsa15',text:'My throat feels dry'},
+    {id:'sticsa16',text:'I keep busy to avoid uncomfortable thoughts'},
+    {id:'sticsa17',text:'I cannot concentrate without irrelevant thoughts intruding'},
+    {id:'sticsa18',text:'My breathing is fast and shallow'},
+    {id:'sticsa19',text:'I worry that I cannot control my thoughts as well as I would like to'},
+    {id:'sticsa20',text:'I have butterflies in the stomach'},
+    {id:'sticsa21',text:'My palms feel clammy'}];
   return {
-    oci:{id:'oci',stem:'The following statements refer to experiences that many people have in their everyday lives. Choose the option that best describes <strong>how much that experience has distressed or bothered you during the past month</strong>.',
-      labels:['Not at all','A little','Moderately','A lot','Extremely'],values:[0,1,2,3,4],items:oci},
-    phq:{id:'phq',stem:STEM_2WK,labels:RESP_2WK,values:[0,1,2,3],items:phq},
-    gad:{id:'gad',stem:STEM_GAD,labels:RESP_2WK,values:[0,1,2,3],items:gad},
-    ius:{id:'ius',stem:'Please read each statement and choose the option that best describes <strong>how characteristic it is of you</strong>.',labels:RESP_IUS,values:[1,2,3,4,5],items:ius}};
+    stai:{id:'stai',stem:'A number of statements which people have used to describe themselves are given below. Read each statement and then select the appropriate response to indicate <strong>how you generally feel</strong>. There are no right or wrong answers. Do not spend too much time on any one statement but give the answer which seems to describe how you generally feel.',
+      labels:['Almost never','Sometimes','Often','Almost always'],values:[1,2,3,4],items:stai},
+    sticsa:{id:'sticsa',stem:'Below is a list of statements which can be used to describe how people feel. Please read each statement carefully and select the response which best indicates how often, <strong>in general</strong>, the statement is true of you.',
+      labels:['Not at all','A little','Moderately','Very much so'],values:[1,2,3,4],items:sticsa}};
 }
 const Q_DEFS=buildQDefs();
 function startQuestionnaires(){STATE.qi=0;renderQ();}
@@ -937,33 +927,28 @@ function qBack(){
 function finishQ(){
   const c=STATE.qCur,qd=c.qd;
   STATE.q[qd.id]={resp:c.resp,item_rts:c.rts,rt_ms:ts()-c.t0,position:STATE.qi+1};
-  if(qd.id==='phq'&&CONFIG.includePHQ9Item9&&c.resp.phq9>0)STATE.item9Flag=true;
   STATE.qi++;
   if(STATE.qi<STATE.qOrder.length)showScreen('scr-q-break');else showScreen('scr-demographics');
 }
 function scoreQuestionnaires(){
   const r=k=>STATE.q[k]?STATE.q[k].resp:{},sum=(o,ids)=>ids.reduce((a,id)=>a+(o[id]||0),0),rng=(p,a,b)=>{const x=[];for(let i=a;i<=b;i++)x.push(p+i);return x};
-  const phq=r('phq'),gad=r('gad'),ius=r('ius'),oci=r('oci'),out={};
-  out.phq8_total=sum(phq,rng('phq',1,8));
-  out.phq9_item9=CONFIG.includePHQ9Item9?phq.phq9:'';
-  out.phq9_total=CONFIG.includePHQ9Item9?out.phq8_total+phq.phq9:'';
-  out.gad7_total=sum(gad,rng('gad',1,7));
-  out.ius12_total=sum(ius,rng('ius',1,12));
-  out.ius12_prospective=sum(ius,['ius1','ius2','ius4','ius5','ius8','ius9','ius11']);
-  out.ius12_inhibitory=sum(ius,['ius3','ius6','ius7','ius10','ius12']);
-  out.ocir_total=sum(oci,rng('oci',1,18));
-  ['hoarding','checking','ordering','neutralising','washing','obsessing'].forEach(sub=>{
-    out['ocir_'+sub]=sum(oci,Q_DEFS.oci.items.filter(it=>it.sub===sub).map(it=>it.id));});
-  out.attn_phq_pass=phq.attn_phq===2?1:0;
-  out.attn_ius_pass=ius.attn_ius===3?1:0;
-  out.attn_oci_pass=oci.attn_oci===3?1:0;
-  out.attn_gad_pass=gad.attn_gad===1?1:0;
-  out.attention_checks_passed=out.attn_phq_pass+out.attn_gad_pass+out.attn_ius_pass+out.attn_oci_pass;
-  out.attention_checks_total=4;
-  ['phq','gad','ius','oci'].forEach(k=>{
+  const stai=r('stai'),sticsa=r('sticsa'),out={};
+  // STAI-T: raw responses (1 = Almost never ... 4 = Almost always) are saved as stai1..stai20; stai<i>_scored is coded
+  // as in Bari & Gershman (4 = high anxiety, anxiety-absent items reversed as 5 - response).
+  const staiScored={};for(let i=1;i<=20;i++){const v=stai['stai'+i];staiScored[i]=(v===undefined)?'':(STAI_REVERSE.includes(i)?5-v:v);}
+  out.stait_total=Object.values(staiScored).reduce((a,v)=>a+(v===''?0:v),0);
+  out.sticsat_somatic=sum(sticsa,STICSA_SOMATIC.map(i=>'sticsa'+i));
+  out.sticsat_cognitive=sum(sticsa,STICSA_COGNITIVE.map(i=>'sticsa'+i));
+  out.sticsat_total=out.sticsat_somatic+out.sticsat_cognitive;
+  out.attn_stai_pass=stai.attn_stai===3?1:0;
+  out.attn_sticsa_pass=sticsa.attn_sticsa===2?1:0;
+  out.attention_checks_passed=out.attn_stai_pass+out.attn_sticsa_pass;
+  out.attention_checks_total=2;
+  ['stai','sticsa'].forEach(k=>{
     Q_DEFS[k].items.forEach(it=>{out[it.id]=r(k)[it.id];out[it.id+'_rt']=STATE.q[k]&&STATE.q[k].item_rts?STATE.q[k].item_rts[it.id]:'';});
     out[k+'_rt_ms']=STATE.q[k]?STATE.q[k].rt_ms:'';out[k+'_position']=STATE.q[k]?STATE.q[k].position:'';
   });
+  for(let i=1;i<=20;i++)out['stai'+i+'_scored']=staiScored[i];
   return out;
 }
 
@@ -1014,7 +999,6 @@ async function goToCredit(ev){
   window.location.href=a.href;
 }
 function showDebrief(){
-  document.getElementById('item9-box').style.display=STATE.item9Flag?'block':'none';
   document.getElementById('debrief-total').textContent=STATE.totalScore;
   const tbody=document.getElementById('debrief-block-rows');tbody.innerHTML='';
   STATE.blockDefs.forEach((bd,i)=>{const tr=document.createElement('tr');
@@ -1043,8 +1027,7 @@ function buildCSV(){
     diag_answered:STATE.demographics.diag_answered,diag_depression:STATE.demographics.diag_depression,diag_anxiety:STATE.demographics.diag_anxiety,diag_ocd:STATE.demographics.diag_ocd,
     diag_none:STATE.demographics.diag_none,diag_prefer_not_to_say:STATE.demographics.diag_prefer_not_to_say,
     cfg_depth_sd_nonsymbolic:[1,2,3].map(d=>CONFIG.depthSD[d]).join('|'),cfg_sym_means:CONFIG.symMeans.join('|'),cfg_sym_sd:CONFIG.symSD,cfg_q_min_item_ms:CONFIG.qMinItemMs,cfg_counterbalance_cost_order:CONFIG.counterbalanceCostOrder?1:0,
-    cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,cfg_free_movement:CONFIG.freeMovement?1:0,
-    cfg_phq9_item9_included:CONFIG.includePHQ9Item9?1:0};
+    cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,cfg_free_movement:CONFIG.freeMovement?1:0};
   Object.assign(pd,STATE.cb);
   STATE.blockDefs.forEach((bd,i)=>{pd['score_'+bd.id]=STATE.blockScores[bd.id]||0;pd['block_cc_errors_'+bd.id]=STATE.blockCCErrors[bd.id]||0;pd['block_cc_attempts_'+bd.id]=STATE.blockCCAttempts[bd.id]||0;});
   STATE.blockRatings.forEach(r=>{pd['self_rating_'+r.blockId]=r.rating;pd['self_rating_rt_'+r.blockId]=r.rt;});
@@ -1067,7 +1050,7 @@ function buildCSV(){
     'node_cue_mean','node_on_exp_best_route','click_number','route','route_values','path_reward','click_cost','trial_score',
     'n_clicks','n_clicks_d1','n_clicks_d2','n_clicks_d3','prop_nodes_revealed','first_click_depth','n_clicks_on_route','n_clicks_off_route',
     'n_clicks_after_route_revealed','n_route_unrevealed','route_unrevealed_reward','executed_without_clicking','exp_best_route','exp_best_net','exp_second_net','exp_margin','chose_exp_best_route','exp_shortfall',
-    'score_total','phq8_total','phq9_total','gad7_total','ius12_total','ius12_prospective','ius12_inhibitory','ocir_total','ocir_checking','attention_checks_passed'];
+    'score_total','stait_total','sticsat_somatic','sticsat_cognitive','sticsat_total','attention_checks_passed'];
   const ks=new Set();rows.forEach(r=>Object.keys(r).forEach(k=>ks.add(k)));
   const keys=[...lead.filter(k=>ks.has(k)),...[...ks].filter(k=>!lead.includes(k))];
   const esc=v=>{const s=(v===undefined||v===null)?'':String(v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
