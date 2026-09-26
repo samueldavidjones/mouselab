@@ -19,6 +19,8 @@ textarea{max-width:100%;min-height:80px}
 #task-canvas{border:1px solid #ccc;background:#fafaf5;display:block;margin:0 auto;width:700px;height:500px}
 .phase-label{display:inline-block;padding:3px 12px;border-radius:3px;font-size:.85em;font-weight:bold}
 .phase-plan{background:#d4edfc;color:#1a5276}.phase-act{background:#d5f5e3;color:#1e7d32}.phase-done{background:#f9e79f;color:#7d6608}
+
+.go-btn{display:block;margin:18px auto 0;background:#27ae60;font-size:1.15em;padding:14px 40px;font-weight:bold}.go-btn:hover{background:#1e8449}
 #btn-execute{background:#27ae60;font-size:1.1em;padding:10px 30px}#btn-execute:hover{background:#1e8449}
 #btn-stop{background:#c0392b;font-size:1.1em;padding:10px 30px}#btn-stop:hover{background:#962d22}
 .cost-box{display:inline-block;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:.95em;background:#fdecea;color:#a93226;margin-right:8px}
@@ -77,7 +79,7 @@ textarea{max-width:100%;min-height:80px}
   <h2>Are there any risks or disadvantages?</h2>
   <p>The questionnaires ask about things such as low mood, sleep, worry and anxiety over the last two weeks, which some people may find uncomfortable. You can stop at any time. The questionnaires are not a diagnostic assessment, and because your answers are anonymised we cannot give you feedback on them or contact you about them. Details of organisations that offer free, confidential support are provided at the end of the study.</p>
   <h2>What will I receive for taking part?</h2>
-  <p>You will receive course credit through SONA for taking part. Please try to earn as many points as you can in the task.</p>
+  <p>You will receive course credit through SONA for taking part. In addition, <strong>each point you earn buys you a raffle ticket that enters you into a draw for a &pound;25 Amazon voucher</strong>. Please try to earn as many points as you can in the task.</p>
   <h2>What if I don't want to take part?</h2>
   <p>Your participation is completely voluntary, so it is up to you whether you would like to take part. You can withdraw from the study at any point without having to provide any explanation. After the study is complete, you can withdraw your data for up to four weeks by contacting the research team (contact details below). After four weeks, data will be fully anonymised and it will no longer be possible to identify your individual data.</p>
   <h2>Will my taking part in the study be kept confidential?</h2>
@@ -165,9 +167,8 @@ textarea{max-width:100%;min-height:80px}
     <label><input type="radio" name="q7" value="a"> It counts as zero</label>
     <label><input type="radio" name="q7" value="b"> You collect its hidden reward, which could be positive or negative</label>
     <label><input type="radio" name="q7" value="c"> You can't &mdash; a location must be revealed before you can move onto it</label></div>
-  <button id="btn-quiz-check" onclick="submitQuiz()">Check answers</button>
-  <p class="err" id="quiz-err"></p>
-  <button id="btn-quiz-continue" onclick="quizContinue()" style="display:none">Continue</button>
+  <p class="err" id="quiz-err" style="margin-top:10px;font-size:1em;font-weight:bold"></p>
+  <button id="btn-quiz-check" class="go-btn" onclick="submitQuiz()">Check answers and continue</button>
 </div>
 
 <!-- ================= BLOCK INTRO ================= -->
@@ -177,10 +178,9 @@ textarea{max-width:100%;min-height:80px}
   <div id="block-intro-cc" style="background:#fdebd0;border-radius:6px;padding:16px 20px;margin-top:16px">
     <p id="bcc-title" style="font-weight:bold;margin-bottom:8px">Brief comprehension check</p>
     <div id="bcc-questions"></div>
-    <button id="btn-check-cc" onclick="submitBlockCC()" style="margin-top:14px">Check answers</button>
-    <p class="err" id="bcc-err"></p>
   </div>
-  <button id="btn-start-block" onclick="startBlock()">Begin</button>
+  <p class="err" id="bcc-err" style="margin-top:10px;font-size:1em;font-weight:bold"></p>
+  <button id="btn-start-block" class="go-btn" onclick="startBlock()">Begin</button>
 </div>
 
 <div class="screen" id="scr-block-rating">
@@ -197,13 +197,6 @@ textarea{max-width:100%;min-height:80px}
   <div style="text-align:center"><button onclick="submitBlockRating()">Continue</button></div>
 </div>
 
-<div class="screen" id="scr-strategy">
-  <h1>Strategy reflection</h1>
-  <p>Please briefly describe your strategy in the block you just completed. For instance, how did you decide when to stop searching?</p>
-  <textarea id="strategy-text"></textarea>
-  <p class="err" id="strategy-err"></p>
-  <button onclick="submitStrategy()">Continue</button>
-</div>
 
 <div class="screen" id="scr-separator">
   <h1>Block complete</h1>
@@ -293,7 +286,6 @@ textarea{max-width:100%;min-height:80px}
     <div class="consent-item"><input type="checkbox" class="diag" id="diag-anxiety" onchange="diagChanged(this)"><span>An anxiety disorder (for example, generalised anxiety disorder, panic disorder or social anxiety disorder)</span></div>
     <div class="consent-item"><input type="checkbox" class="diag" id="diag-ocd" onchange="diagChanged(this)"><span>Obsessive-compulsive disorder (OCD)</span></div>
     <div class="consent-item"><input type="checkbox" class="diag diag-excl" id="diag-none" onchange="diagChanged(this)"><span>None of these</span></div>
-    <div class="consent-item"><input type="checkbox" class="diag diag-excl" id="diag-unsure" onchange="diagChanged(this)"><span>Not sure</span></div>
     <div class="consent-item"><input type="checkbox" class="diag diag-excl" id="diag-pnts" onchange="diagChanged(this)"><span>Prefer not to say</span></div>
   </div>
   <p class="err" id="demo-err"></p>
@@ -309,7 +301,7 @@ textarea{max-width:100%;min-height:80px}
   <p>Thank you for completing this study. The total number of points you earned is <strong id="debrief-total"></strong>.</p>
   <p>Below is a breakdown of points by block.</p>
   <table style="border-collapse:collapse;margin:12px 0;max-width:400px"><thead><tr><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Block</th><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Points</th></tr></thead><tbody id="debrief-block-rows"></tbody></table>
-  <div class="credit-box"><p style="margin:0">Your responses have been saved. <strong>To receive your course credit, please read the information below and then click the credit button at the bottom of this page.</strong></p></div>
+  <div class="credit-box"><p style="margin:0">Your responses have been saved.</p></div>
   <p>Understanding agentic behaviour is at the frontier of cognitive neuroscience. This study investigated how people search for information and make decisions under uncertainty &mdash; for example, how much they check before committing, and how this changes when information is free or costly &mdash; and whether these patterns relate to everyday experiences of low mood, worry, anxiety and repetitive habits such as checking. The questionnaires you completed are widely used research measures; they are not a diagnosis.</p>
 
   <div class="support">
@@ -379,8 +371,7 @@ const CONFIG={
   counterbalanceCostOrder:false, // false = fixed order (free then costly within each pair). true = random per participant.
   newSymbolsForCost5:true,  // true: block 4 uses a fresh symbol set (so the cost effect isn't carried by prior learning)
   includePHQ9Item9:false,   // PHQ-8 by default. If true, item 9 is asked and endorsers see a support box.
-  strategyReflection:true,
-  qMinItemMs:1000,           // questionnaire answer buttons are inactive for this long after each item appears
+  qMinItemMs:1300,           // questionnaire answer buttons are inactive for this long after each item appears
   dataPipeId:'5HYh2n8mS8O8',          // DataPipe experiment ID (DataPipe saves the files to the Google Drive linked to this experiment)
   // SONA: set the study URL in SONA to  ...task.html?id=%SURVEY_CODE%
   // and paste SONA's client-side completion URL here (it ends in survey_code=XXXX; leave XXXX in place):
@@ -403,7 +394,7 @@ const symName=s=>SYM_SAFE[s]||s;
    ============================================================ */
 function ts(){return Date.now()}
 const STATE={participantId:'',consentTimestamp:'',quizAttempts:0,globalTrialNum:0,currentBlockIdx:-1,currentTrialInBlock:0,
-  isPractice:false,trial:null,blockDefs:[],events:[],strategyComments:[],valEstData:[],pairedChoiceData:[],
+  isPractice:false,trial:null,blockDefs:[],events:[],valEstData:[],pairedChoiceData:[],
   cb:{},blockCCErrors:{},blockCCAttempts:{},blockRatings:[],qOrder:[],qi:0,q:{},demographics:{},totalScore:0,blockScores:{},item9Flag:false,
   studyT0:ts(),csv:'',filename:'',sonaFromUrl:false};
 function readSonaId(){
@@ -473,19 +464,12 @@ function sendConsent(){
 }
 function submitQuiz(){
   const ans={q1:'c',q2:'c',q3:'a',q4:'c',q5:'a',q6:'c',q7:'b'},e=document.getElementById('quiz-err');
-  if(Object.keys(ans).some(n=>!document.querySelector('input[name="'+n+'"]:checked'))){e.style.color='';e.textContent='Please answer every question.';return;}
+  if(Object.keys(ans).some(n=>!document.querySelector('input[name="'+n+'"]:checked'))){e.style.color='';e.textContent='Please answer every question.';e.scrollIntoView({block:'center',behavior:'smooth'});return;}
   STATE.quizAttempts++;
   const pass=Object.entries(ans).every(([n,a])=>document.querySelector('input[name="'+n+'"]:checked').value===a);
-  if(pass){e.style.color='#1e7d32';e.textContent='All correct \u2014 click Continue when you are ready.';
-    document.getElementById('btn-quiz-check').style.display='none';document.getElementById('btn-quiz-continue').style.display='';}
-  else{e.style.color='';e.textContent='Not quite \u2014 please re-read the instructions and check your answers.';}
+  if(pass){e.textContent='';advanceToNextBlock();}
+  else{e.style.color='';e.textContent='Not quite \u2014 please re-read the instructions and check your answers.';e.scrollIntoView({block:'center',behavior:'smooth'});}
 }
-function quizContinue(){document.getElementById('btn-quiz-continue').style.display='none';advanceToNextBlock();}
-document.addEventListener('change',ev=>{   // changing an answer after passing requires re-checking
-  if(ev.target&&ev.target.name&&/^q[1-7]$/.test(ev.target.name)&&document.getElementById('scr-quiz').classList.contains('active')){
-    document.getElementById('btn-quiz-continue').style.display='none';document.getElementById('btn-quiz-check').style.display='';
-    const e=document.getElementById('quiz-err');e.textContent='';e.style.color='';}
-});
 
 /* ============================================================
    BOARDS
@@ -750,31 +734,26 @@ function advanceToNextBlock(){
   document.getElementById('bcc-title').textContent=bd.clickCost>0?'Quiz: please answer every question correctly to begin':'Brief comprehension check';
   document.getElementById('block-intro-cc').style.display=Q.length?'':'none';
   document.getElementById('bcc-questions').innerHTML=Q.map((q,k)=>'<p'+(k?' style="margin-top:12px"':'')+'>'+q.text+'</p>'+
-    q.opts.map(o=>'<label style="display:block;margin:4px 0 4px 16px;cursor:pointer"><input type="radio" name="'+q.name+'" value="'+o[0]+'" onchange="blockCCChanged()"> '+o[1]+'</label>').join('')).join('');
+    q.opts.map(o=>'<label style="display:block;margin:4px 0 4px 16px;cursor:pointer"><input type="radio" name="'+q.name+'" value="'+o[0]+'"> '+o[1]+'</label>').join('')).join('');
   document.getElementById('bcc-err').textContent='';
   STATE.blockCCErrors[bd.id]=0;STATE.blockCCAttempts[bd.id]=0;
-  document.getElementById('btn-check-cc').style.display='';
-  const btn=document.getElementById('btn-start-block');btn.disabled=Q.length>0;btn.style.background=Q.length?'#999':'#2a5a8a';
+  document.getElementById('btn-start-block').textContent=Q.length?'Check answers and begin':'Begin';
   showScreen('scr-block-intro');
 }
-/* Answers are checked only when 'Check answers' is pressed; feedback never says which answer was wrong. */
-function blockCCChanged(){
-  const btn=document.getElementById('btn-start-block');btn.disabled=true;btn.style.background='#999';
-  document.getElementById('btn-check-cc').style.display='';
-  const e=document.getElementById('bcc-err');e.textContent='';e.style.color='';
-}
+/* One button checks the block quiz and, if every answer is correct, starts the block. Feedback never says which answer was wrong. */
 function submitBlockCC(){
-  const bd=STATE.blockDefs[STATE.currentBlockIdx],btn=document.getElementById('btn-start-block'),e=document.getElementById('bcc-err');
+  const bd=STATE.blockDefs[STATE.currentBlockIdx],e=document.getElementById('bcc-err');
   const unanswered=STATE.blockQs.some(q=>!document.querySelector('input[name="'+q.name+'"]:checked'));
-  if(unanswered){e.style.color='';e.textContent='Please answer every question.';return;}
+  if(unanswered){e.textContent='Please answer every question.';e.scrollIntoView({block:'center',behavior:'smooth'});return false;}
   STATE.blockCCAttempts[bd.id]++;
   const allOk=STATE.blockQs.every(q=>document.querySelector('input[name="'+q.name+'"]:checked').value===q.answer);
-  if(allOk){e.style.color='#1e7d32';e.textContent='All correct \u2014 click Begin when you are ready.';
-    document.getElementById('btn-check-cc').style.display='none';btn.disabled=false;btn.style.background='#2a5a8a';}
-  else{STATE.blockCCErrors[bd.id]++;e.style.color='';e.textContent='Not quite \u2014 please re-read the instructions above and check your answers.';
-    btn.disabled=true;btn.style.background='#999';}
+  if(!allOk){STATE.blockCCErrors[bd.id]++;e.textContent='Not quite \u2014 please re-read the instructions above and check your answers.';e.scrollIntoView({block:'center',behavior:'smooth'});return false;}
+  return true;
 }
-function startBlock(){if(document.getElementById('btn-start-block').disabled)return;STATE.currentTrialInBlock=0;nextTrial();}
+function startBlock(){
+  if(STATE.blockQs&&STATE.blockQs.length&&!submitBlockCC())return;
+  document.getElementById('bcc-err').textContent='';STATE.currentTrialInBlock=0;nextTrial();
+}
 function afterBlock(){
   const sl=document.getElementById('br-slider');sl.value=50;sl.style.opacity='0.35';delete sl.dataset.touched;
   document.getElementById('br-err').textContent='';STATE.brT0=ts();showScreen('scr-block-rating');
@@ -784,18 +763,9 @@ function submitBlockRating(){
   if(!sl.dataset.touched){document.getElementById('br-err').textContent='Please move the slider to give your answer.';return;}
   const bd=STATE.blockDefs[STATE.currentBlockIdx];
   STATE.blockRatings.push({blockId:bd.id,rating:parseInt(sl.value),rt:ts()-STATE.brT0,score:STATE.blockScores[bd.id]||0});
-  if(CONFIG.strategyReflection){document.getElementById('strategy-text').value='';showScreen('scr-strategy');}
-  else afterStrategy();
+  afterRating();
 }
-function submitStrategy(){
-  const bd=STATE.blockDefs[STATE.currentBlockIdx];
-  if(document.getElementById('strategy-text').value.trim().length<3){document.getElementById('strategy-err').textContent='Please write a short description of your strategy to continue.';return;}
-  document.getElementById('strategy-err').textContent='';
-  STATE.strategyComments.push({blockId:bd.id,text:document.getElementById('strategy-text').value.trim()});
-  document.getElementById('strategy-text').value='';
-  afterStrategy();
-}
-function afterStrategy(){
+function afterRating(){
   if(STATE.blockDefs[STATE.currentBlockIdx].cueMode==='symbolic')startValEst();   // symbol knowledge tests only after symbolic blocks
   else endOfBlock();
 }
@@ -879,16 +849,18 @@ function buildQDefs(){
     {id:'attn_phq',text:'To show that you are reading carefully, please select \u201cMore than half the days\u201d for this item.',attn:2},
     {id:'phq6',text:'Feeling bad about yourself \u2014 or that you are a failure or have let yourself or your family down'},
     {id:'phq7',text:'Trouble concentrating on things, such as reading the newspaper or watching television'},
-    {id:'phq8',text:'Moving or speaking so slowly that other people could have noticed. Or the opposite \u2014 being so fidgety or restless that you have been moving around a lot more than usual'}];
+    {id:'phq8',text:'Moving or speaking so slowly that other people could have noticed? Or the opposite \u2014 being so fidgety or restless that you have been moving around a lot more than usual'}];
   if(CONFIG.includePHQ9Item9)phq.push({id:'phq9',text:'Thoughts that you would be better off dead, or of hurting yourself in some way'});
   const gad=[
     {id:'gad1',text:'Feeling nervous, anxious, or on edge'},
     {id:'gad2',text:'Not being able to stop or control worrying'},
     {id:'gad3',text:'Worrying too much about different things'},
     {id:'gad4',text:'Trouble relaxing'},
+    {id:'attn_gad',text:'To show that you are reading carefully, please select \u201cSeveral days\u201d for this item.',attn:1},
     {id:'gad5',text:'Being so restless that it is hard to sit still'},
     {id:'gad6',text:'Becoming easily annoyed or irritable'},
     {id:'gad7',text:'Feeling afraid, as if something awful might happen'}];
+  const STEM_GAD='Over the <strong>last 2 weeks</strong>, how often have you been bothered by the following problems?';
   const ius=[
     {id:'ius1',text:'Unforeseen events upset me greatly.',sub:'P'},
     {id:'ius2',text:'It frustrates me not having all the information I need.',sub:'P'},
@@ -927,7 +899,7 @@ function buildQDefs(){
     oci:{id:'oci',stem:'The following statements refer to experiences that many people have in their everyday lives. Choose the option that best describes <strong>how much that experience has distressed or bothered you during the past month</strong>.',
       labels:['Not at all','A little','Moderately','A lot','Extremely'],values:[0,1,2,3,4],items:oci},
     phq:{id:'phq',stem:STEM_2WK,labels:RESP_2WK,values:[0,1,2,3],items:phq},
-    gad:{id:'gad',stem:STEM_2WK,labels:RESP_2WK,values:[0,1,2,3],items:gad},
+    gad:{id:'gad',stem:STEM_GAD,labels:RESP_2WK,values:[0,1,2,3],items:gad},
     ius:{id:'ius',stem:'Please read each statement and choose the option that best describes <strong>how characteristic it is of you</strong>.',labels:RESP_IUS,values:[1,2,3,4,5],items:ius}};
 }
 const Q_DEFS=buildQDefs();
@@ -985,8 +957,9 @@ function scoreQuestionnaires(){
   out.attn_phq_pass=phq.attn_phq===2?1:0;
   out.attn_ius_pass=ius.attn_ius===3?1:0;
   out.attn_oci_pass=oci.attn_oci===3?1:0;
-  out.attention_checks_passed=out.attn_phq_pass+out.attn_ius_pass+out.attn_oci_pass;
-  out.attention_checks_total=3;
+  out.attn_gad_pass=gad.attn_gad===1?1:0;
+  out.attention_checks_passed=out.attn_phq_pass+out.attn_gad_pass+out.attn_ius_pass+out.attn_oci_pass;
+  out.attention_checks_total=4;
   ['phq','gad','ius','oci'].forEach(k=>{
     Q_DEFS[k].items.forEach(it=>{out[it.id]=r(k)[it.id];out[it.id+'_rt']=STATE.q[k]&&STATE.q[k].item_rts?STATE.q[k].item_rts[it.id]:'';});
     out[k+'_rt_ms']=STATE.q[k]?STATE.q[k].rt_ms:'';out[k+'_position']=STATE.q[k]?STATE.q[k].position:'';
@@ -997,7 +970,7 @@ function scoreQuestionnaires(){
 /* ============================================================
    DEMOGRAPHICS, SAVE, DEBRIEF
    ============================================================ */
-/* 'None of these', 'Not sure' and 'Prefer not to say' each clear the other boxes; ticking a diagnosis clears them. The question is optional. */
+/* 'None of these' and 'Prefer not to say' each clear the other boxes; ticking a diagnosis clears them. The question is optional. */
 function diagChanged(el){
   if(!el.checked)return;
   if(el.classList.contains('diag-excl'))document.querySelectorAll('.diag').forEach(c=>{if(c!==el)c.checked=false;});
@@ -1011,7 +984,7 @@ function submitDemographics(){
   const dg=id=>document.getElementById('diag-'+id).checked?1:0,answered=[...document.querySelectorAll('.diag')].some(c=>c.checked);
   STATE.demographics={age:agePnts?'Prefer not to say':ageVal,gender:gen,english:eng,
     diag_answered:answered?1:0,diag_depression:answered?dg('depression'):'',diag_anxiety:answered?dg('anxiety'):'',diag_ocd:answered?dg('ocd'):'',
-    diag_none:answered?dg('none'):'',diag_not_sure:answered?dg('unsure'):'',diag_prefer_not_to_say:answered?dg('pnts'):''};
+    diag_none:answered?dg('none'):'',diag_prefer_not_to_say:answered?dg('pnts'):''};
   finishStudy();
 }
 /* Data are sent in the background while the participant reads the debrief (up to 5 attempts).
@@ -1068,13 +1041,12 @@ function buildCSV(){
     quiz_attempts:STATE.quizAttempts,score_total:STATE.totalScore,
     age:STATE.demographics.age||'',gender:STATE.demographics.gender||'',english_first:STATE.demographics.english||'',
     diag_answered:STATE.demographics.diag_answered,diag_depression:STATE.demographics.diag_depression,diag_anxiety:STATE.demographics.diag_anxiety,diag_ocd:STATE.demographics.diag_ocd,
-    diag_none:STATE.demographics.diag_none,diag_not_sure:STATE.demographics.diag_not_sure,diag_prefer_not_to_say:STATE.demographics.diag_prefer_not_to_say,
+    diag_none:STATE.demographics.diag_none,diag_prefer_not_to_say:STATE.demographics.diag_prefer_not_to_say,
     cfg_depth_sd_nonsymbolic:[1,2,3].map(d=>CONFIG.depthSD[d]).join('|'),cfg_sym_means:CONFIG.symMeans.join('|'),cfg_sym_sd:CONFIG.symSD,cfg_q_min_item_ms:CONFIG.qMinItemMs,cfg_counterbalance_cost_order:CONFIG.counterbalanceCostOrder?1:0,
     cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,cfg_free_movement:CONFIG.freeMovement?1:0,
     cfg_phq9_item9_included:CONFIG.includePHQ9Item9?1:0};
   Object.assign(pd,STATE.cb);
   STATE.blockDefs.forEach((bd,i)=>{pd['score_'+bd.id]=STATE.blockScores[bd.id]||0;pd['block_cc_errors_'+bd.id]=STATE.blockCCErrors[bd.id]||0;pd['block_cc_attempts_'+bd.id]=STATE.blockCCAttempts[bd.id]||0;});
-  STATE.strategyComments.forEach(sc=>{pd['strategy_'+sc.blockId]=sc.text||'';});
   STATE.blockRatings.forEach(r=>{pd['self_rating_'+r.blockId]=r.rating;pd['self_rating_rt_'+r.blockId]=r.rt;});
   STATE.valEstData.forEach(v=>{const k='ve_'+v.block_id+'_'+v.symbol+'_';
     pd[k+'est']=v.estimated_value;pd[k+'true']=v.true_mean;pd[k+'err']=v.signed_error;pd[k+'conf']=v.confidence;pd[k+'rt']=v.rt_ms;});
