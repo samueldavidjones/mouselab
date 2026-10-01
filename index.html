@@ -290,7 +290,7 @@ body.rec-sona .only-prolific{display:none}
   <p>That is the end of the tasks. Thank you.</p>
   <p>Next there are <strong>two short questionnaires</strong> about how you generally feel. They take about five minutes in total.</p>
   <p>There are no right or wrong answers. Please answer each question honestly, based on how you have actually been feeling. Your answers do not affect your score. <strong>However, this section does include attention checks</strong>.</p>
-  <div class="note"><p style="margin:0">Some of these questions ask about difficult feelings. If you find this uncomfortable you can stop at any time. Details of free, confidential support are given at the end of the study.</p></div>
+  <div class="note"><p style="margin:0">Some of these questions ask about difficult feelings. Details of free, confidential support are given at the end of the study.</p></div>
   <button onclick="startQuestionnaires()">Continue</button>
 </div>
 
@@ -314,8 +314,6 @@ body.rec-sona .only-prolific{display:none}
   <div class="form-row"><label>Age</label><input type="number" id="demo-age" min="16" max="99" style="max-width:120px"> <label style="font-weight:normal;display:inline;margin-left:12px"><input type="checkbox" id="demo-age-pnts" onchange="if(this.checked){document.getElementById('demo-age').value='';document.getElementById('demo-age').disabled=true;}else{document.getElementById('demo-age').disabled=false;}"> Prefer not to say</label></div>
   <div class="form-row"><label>Gender</label><select id="demo-gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option></select></div>
   <div class="form-row"><label>Is English your first language?</label><select id="demo-english"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
-  <div class="form-row"><label>Are you currently taking any prescribed medication for depression?</label><select id="demo-med-dep"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
-  <div class="form-row"><label>Are you currently taking any prescribed medication for anxiety?</label><select id="demo-med-anx"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
   <div class="form-row"><label>Have you ever received a formal diagnosis from a health professional of any of the following? (optional; tick all that apply)</label>
     <div class="consent-item"><input type="checkbox" class="diag" id="diag-depression" onchange="diagChanged(this)"><span>Depression</span></div>
     <div class="consent-item"><input type="checkbox" class="diag" id="diag-anxiety" onchange="diagChanged(this)"><span>An anxiety disorder (for example, generalised anxiety disorder, panic disorder or social anxiety disorder)</span></div>
@@ -323,6 +321,8 @@ body.rec-sona .only-prolific{display:none}
     <div class="consent-item"><input type="checkbox" class="diag diag-excl" id="diag-none" onchange="diagChanged(this)"><span>None of these</span></div>
     <div class="consent-item"><input type="checkbox" class="diag diag-excl" id="diag-pnts" onchange="diagChanged(this)"><span>Prefer not to say</span></div>
   </div>
+  <div class="form-row"><label>Are you currently taking any prescribed medication for depression?</label><select id="demo-med-dep"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
+  <div class="form-row"><label>Are you currently taking any prescribed medication for anxiety?</label><select id="demo-med-anx"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
   <p class="err" id="demo-err"></p>
   <button onclick="submitDemographics()">Continue</button>
 </div>
