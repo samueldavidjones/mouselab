@@ -53,6 +53,9 @@ textarea{max-width:100%;min-height:80px}
 .free-notice{border:2px solid #4f7d62;background:#e9f5ec;border-radius:6px;padding:12px 20px;margin:4px 0 18px;font-weight:bold;color:#2f5d43}
 .cost-warning .cw-head{font-size:1.3em;font-weight:bold;color:#1d4068;margin-bottom:6px}
 .note{background:#f4f0e4;border-left:4px solid #b3a06a;padding:12px 18px;margin:16px 0}
+body.rec-sona .only-prolific{display:none}
+.ip-prompt{font-size:.9em;color:#555;background:#fafaf5;border:1px solid #e3e3da;border-radius:6px;padding:10px 16px;margin:6px 0 0}
+#scr-ip .q-opt,#scr-ip-intro .q-opt{max-width:150px}
 </style>
 </head>
 <body>
@@ -62,9 +65,9 @@ textarea{max-width:100%;min-height:80px}
 <div class="screen active" id="scr-pid">
   <h1>Welcome</h1>
   <p>Please note that it <strong>is only possible to complete this task on a desktop or laptop computer with a keyboard</strong>.</p>
-  <p>Participants on tablets or mobile phones will not be able to complete the task and so will not receive course credit.</p>
-  <p>If you are working on a desktop computer and are happy to continue, <span id="pid-ask">please enter your SONA participant ID below.</span><span id="pid-auto" style="display:none">please click Continue.</span></p>
-  <div class="form-row" id="pid-row" style="margin-top:24px"><label>SONA participant ID</label><input type="text" id="inp-pid"></div>
+  <p class="only-prolific">Participants on tablets or mobile phones will not be able to complete the task. If you are not on a computer with a keyboard, please return the study on Prolific.</p>
+  <p>If you are working on a desktop computer and are happy to continue, <span id="pid-ask">please enter your <span class="only-prolific">Prolific ID</span> below.</span><span id="pid-auto" style="display:none">please click Continue.</span></p>
+  <div class="form-row" id="pid-row" style="margin-top:24px"><label><span class="only-prolific">Prolific ID</span></label><input type="text" id="inp-pid"></div>
   <p class="err" id="pid-err"></p><button onclick="submitPid()">Continue</button>
 </div>
 
@@ -75,13 +78,13 @@ textarea{max-width:100%;min-height:80px}
   <h2>What is the purpose of this study?</h2>
   <p>This study will help us understand how people search for information and make decisions under uncertainty, and how this relates to everyday experiences of anxiety, worry and mood. Improving our understanding of these processes could have implications for education, health, and everyday decision-making.</p>
   <h2>What is involved in the study?</h2>
-  <p>To start, we will explain a decision-making task and ask a few comprehension questions so that we can be sure you understand the task before you begin. You will then complete four blocks of the task. After some blocks we will ask a few short questions about what you learned. Finally, you will complete two short questionnaires about how you generally feel (including anxiety, worry and mood), and some optional demographic questions. The whole study should take approximately 25 minutes.</p>
+  <p>To start, we will explain a decision-making task and ask a few comprehension questions so that we can be sure you understand the task before you begin. You will then complete four blocks of the task. After some blocks we will ask a few short questions about what you learned. You will also answer about 30 short questions about imaginary situations, in which you say whether you would want to know in advance what is going to happen (this part comes either at the start or after the task). Finally, you will complete two short questionnaires about how you generally feel (including anxiety, worry and mood), and some optional demographic questions. The whole study should take approximately 30 minutes.</p>
   <h2>Are there any risks or disadvantages?</h2>
   <p>The questionnaires ask about things such as anxiety, worry, low mood and physical feelings of anxiety (for example, a racing heart), which some people may find uncomfortable. You can stop at any time. The questionnaires are not a diagnostic assessment, and because your answers are anonymised we cannot give you feedback on them or contact you about them. Details of organisations that offer free, confidential support are provided at the end of the study.</p>
   <h2>What will I receive for taking part?</h2>
-  <p>You will receive course credit through SONA for taking part. In addition, <strong>each point you earn buys you a raffle ticket that enters you into a draw for a &pound;25 Amazon voucher</strong>. Please try to earn as many points as you can in the task.</p>
+  <p><span class="only-prolific">You will be paid through Prolific for completing the study.</span> In addition, <strong>each point you earn buys you a raffle ticket that enters you into a draw for a &pound;25 Amazon voucher</strong>. Please try to earn as many points as you can in the task.</p>
   <h2>What if I don't want to take part?</h2>
-  <p>Your participation is completely voluntary, so it is up to you whether you would like to take part. You can withdraw from the study at any point without having to provide any explanation. After the study is complete, you can withdraw your data for up to four weeks by contacting the research team (contact details below). After four weeks, data will be fully anonymised and it will no longer be possible to identify your individual data.</p>
+  <p>Your participation is completely voluntary, so it is up to you whether you would like to take part. You can withdraw from the study at any point without having to provide any explanation. After the study is complete, you can withdraw your data for up to four weeks by contacting the research team (contact details below)<span class="only-prolific">, quoting your Prolific ID; you can also message us anonymously through Prolific</span>. After four weeks, data will be fully anonymised and it will no longer be possible to identify your individual data.</p>
   <h2>Will my taking part in the study be kept confidential?</h2>
   <p>Yes, your responses and data will be treated as strictly confidential. Giving basic demographic information (e.g., age, first language) at the end of the study is optional, and we request only your participant ID and digital initials as part of the consent process. Your IP address is not recorded in the dataset used for analysis.</p>
   <h2>What will happen to my data?</h2>
@@ -139,6 +142,8 @@ textarea{max-width:100%;min-height:80px}
 <!-- ================= QUIZ ================= -->
 <div class="screen" id="scr-quiz">
   <h1>Comprehension quiz</h1>
+  <p><a href="#" onclick="toggleQuizInstr(event)" id="quiz-instr-link">Show the task instructions again</a></p>
+  <div id="quiz-instr" class="note" style="display:none"></div>
   <div class="quiz-q"><p>1. What does clicking on a location do?</p>
     <label><input type="radio" name="q1" value="a"> Moves you there</label>
     <label><input type="radio" name="q1" value="b"> Removes it</label>
@@ -251,10 +256,37 @@ textarea{max-width:100%;min-height:80px}
   </div>
 </div>
 
+<!-- ================= INFORMATION PREFERENCE (Bari & Gershman, 2025) ================= -->
+<div class="screen" id="scr-ip-intro">
+  <h1>Decisions about information</h1>
+  <p id="ip-intro-lead"></p>
+  <p>Please read the following carefully:</p>
+  <div class="ip-prompt" style="font-size:1em;color:#222"><p style="margin:0" class="ip-prompt-text"></p></div>
+  <p class="mt">You will then see a series of situations like this example:</p>
+  <div class="q-item" id="ip-example" style="margin-bottom:12px"></div>
+  <div class="q-opts locked" id="ip-example-opts"></div>
+  <p class="mt">For each situation, choose the answer that best describes what you would do. There are no right or wrong answers.</p>
+  <p><strong>These situations are imaginary. Your answers will not affect your points, raffle tickets or payment.</strong> <span id="ip-intro-points"></span></p>
+  <button class="go-btn" onclick="startInfoPref()">Begin</button>
+</div>
+
+<div class="screen" id="scr-ip">
+  <div class="ip-prompt"><p style="margin:0" class="ip-prompt-text"></p></div>
+  <p id="ip-progress" class="small" style="margin-top:12px"></p>
+  <div id="ip-item" class="q-item"></div>
+  <div id="ip-opts" class="q-opts"></div>
+</div>
+
+<div class="screen" id="scr-ip-end">
+  <h1>Thank you</h1>
+  <p>That is the end of this section. Next, you will learn how to do the main task.</p>
+  <button onclick="afterInfoPref()">Continue</button>
+</div>
+
 <!-- ================= QUESTIONNAIRES ================= -->
 <div class="screen" id="scr-q-intro">
   <h1>Some questions about you</h1>
-  <p>That is the end of the task. Thank you.</p>
+  <p>That is the end of the tasks. Thank you.</p>
   <p>Next there are <strong>two short questionnaires</strong> about how you generally feel. They take about five minutes in total.</p>
   <p>There are no right or wrong answers. Please answer each question honestly, based on how you have actually been feeling. Your answers do not affect your score.</p>
   <div class="note"><p style="margin:0">Some of these questions ask about difficult feelings. If you find this uncomfortable you can stop at any time. Details of free, confidential support are given at the end of the study.</p></div>
@@ -298,8 +330,9 @@ textarea{max-width:100%;min-height:80px}
   <p>Thank you for completing this study. The total number of points you earned is <strong id="debrief-total"></strong>.</p>
   <p>Below is a breakdown of points by block.</p>
   <table style="border-collapse:collapse;margin:12px 0;max-width:400px"><thead><tr><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Block</th><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Points</th></tr></thead><tbody id="debrief-block-rows"></tbody></table>
-  <div class="credit-box"><p style="margin:0">Your responses have been saved.</p></div>
-  <p>Understanding agentic behaviour is at the frontier of cognitive neuroscience. This study investigated how people search for information and make decisions under uncertainty &mdash; for example, how much they check before committing, and how this changes when information is free or costly &mdash; and whether these patterns relate to everyday experiences of anxiety (including its physical and cognitive aspects) and low mood. The questionnaires you completed are widely used research measures; they are not a diagnosis.</p>
+  <div class="credit-box"><p style="margin:0" id="save-status">Saving your responses&hellip;</p>
+    <button id="save-retry" style="display:none" onclick="startUpload()">Try saving again</button></div>
+  <p>Understanding agentic behaviour is at the frontier of cognitive neuroscience. This study investigated how people search for information and make decisions under uncertainty &mdash; for example, how much they check before committing, and how this changes when information is free or costly &mdash; and whether these patterns relate to everyday experiences of anxiety (including its physical and cognitive aspects) and low mood. In the questions about imaginary situations, you told us whether you would want to know in advance what was going to happen, even though knowing could not change the outcome; these questions come from a previous study of anxiety and information seeking (Bari &amp; Gershman, 2025), so that we can compare our results directly with theirs. The questionnaires you completed are widely used research measures; they are not a diagnosis.</p>
 
   <div class="support">
     <h2>Support</h2>
@@ -309,22 +342,11 @@ textarea{max-width:100%;min-height:80px}
     <ul>
       <li>If you or someone else is in <strong>immediate danger</strong> or needs urgent medical attention: <strong>call 999</strong> or go to your nearest <strong>Accident &amp; Emergency (A&amp;E)</strong> department.</li>
       <li>If you need urgent mental health support but it is not a life-threatening emergency: <strong>call NHS 111</strong> (choose option 2 for mental health). This is a 24-hour helpline staffed by mental health professionals who can advise you and help you access the right care.</li>
-      <li><strong>Student Wellbeing Helpline (Health Assured)</strong> &mdash; free 24/7 support for all Bangor University students, day or night: <strong>0800 028 3766</strong>.</li>
-      <li>More information: <a href="https://bangoroffice365.sharepoint.com/sites/Hub/SitePages/Urgent-Mental-Health-Help.aspx" target="_blank" rel="noopener">Urgent Mental Health Help</a> and a list of <a href="https://bangoroffice365.sharepoint.com/sites/Hub/SitePages/Recommended-Mental-Health-and-Wellbeing-Resources.aspx#24-7-helplines" target="_blank" rel="noopener">other 24/7 helplines</a> on the Bangor University Hub (university login required).</li>
-    </ul>
-
-    <h3>Bangor University Wellbeing Services</h3>
-    <ul>
-      <li>Email <a href="mailto:wellbeingservices@bangor.ac.uk">wellbeingservices@bangor.ac.uk</a> or phone <strong>01248 388520</strong>.</li>
-      <li><strong>Location:</strong> Neuadd Rathbone, College Road, Bangor, Gwynedd, LL57 2DG (<a href="https://www.bangor.ac.uk/campusmap#rathbone" target="_blank" rel="noopener">view on the campus map</a>; what3words: curry.recital.bulge).</li>
-      <li><strong>Opening hours:</strong> normally 09:00&ndash;17:00, Monday to Friday (appointment only in Neuadd Rathbone).</li>
-      <li><strong>Duty counsellor drop-in:</strong> Monday to Friday, 9.15am to 4.15pm, in the Hub.</li>
-      <li>The Wellbeing and Inclusivity Service is not an emergency or crisis service, but can help you access the right support and make a safety plan for the future. See <a href="https://bangoroffice365.sharepoint.com/sites/Hub/SitePages/Mental-Health-and-Wellbeing-Support-from-Wellbeing-and-Inclusivity-Service.aspx" target="_blank" rel="noopener">Support from the Wellbeing and Inclusivity Service</a>.</li>
     </ul>
 
     <h3>Your GP</h3>
     <ul>
-      <li>For less urgent concerns, contact your GP for medical advice and support, including free NHS talking therapies. If you have not yet registered with a local GP while studying at Bangor, it is important to do so; Wellbeing Services are happy to help you register.</li>
+      <li>For less urgent concerns, contact your GP for medical advice and support, including free NHS talking therapies.</li>
     </ul>
 
     <h3>UK charities and helplines</h3>
@@ -332,18 +354,22 @@ textarea{max-width:100%;min-height:80px}
       <li><strong>Samaritans</strong> &mdash; call <strong>116 123</strong> free, any time, day or night. Welsh language line: 0808 164 0123 (7pm&ndash;11pm every day). <a href="https://www.samaritans.org" target="_blank" rel="noopener">samaritans.org</a></li>
       <li><strong>Shout</strong> &mdash; free, confidential 24/7 text support: text <strong>SHOUT</strong> to <strong>85258</strong>.</li>
       <li><strong>CALL Mental Health Listening Line (Wales)</strong> &mdash; <strong>0800 132 737</strong>, 24/7, or text &ldquo;help&rdquo; to 81066. <a href="https://www.callhelpline.org.uk" target="_blank" rel="noopener">callhelpline.org.uk</a></li>
-      <li><strong>Student Minds</strong> &mdash; the UK&rsquo;s student mental health charity, with information and support for students. <a href="https://www.studentminds.org.uk" target="_blank" rel="noopener">studentminds.org.uk</a></li>
       <li><strong>Mind</strong> &mdash; information and support for depression, anxiety and other mental health problems. Infoline 0300 123 3393. <a href="https://www.mind.org.uk" target="_blank" rel="noopener">mind.org.uk</a></li>
       <li><strong>Anxiety UK</strong> &mdash; support for anxiety. Helpline <strong>03444 775 774</strong> or text 07537 416905 (Monday to Friday, 9.30am to 5.30pm). <a href="https://www.anxietyuk.org.uk" target="_blank" rel="noopener">anxietyuk.org.uk</a></li>
       <li><strong>Hub of Hope</strong> &mdash; search for local mental health support near you. <a href="https://hubofhope.co.uk" target="_blank" rel="noopener">hubofhope.co.uk</a></li>
     </ul>
+    <p class="only-prolific" style="margin-top:12px">If you live outside the UK, please contact your local emergency services or a local helpline.</p>
   </div>
 
   <p>If you have any questions or concerns about this work, please contact project lead Dr Sam Jones via email at <a href="mailto:samuel.jones@bangor.ac.uk">samuel.jones@bangor.ac.uk</a>. Alternatively, please contact Bangor University's Senior Research Governance &amp; Policy Officer at <a href="mailto:seniorresearchgovofficer@bangor.ac.uk">seniorresearchgovofficer@bangor.ac.uk</a>.</p>
   <div class="credit-box">
-    <p id="credit-auto" style="display:none;margin:0 0 10px">When you are ready, click the button below to confirm that you have finished. This grants your SONA credit.</p>
-    <a id="credit-btn" href="#" style="display:none" onclick="goToCredit(event)"><button>Receive my SONA credit</button></a>
-    <p id="credit-manual" style="margin:0">Your participation has been recorded. Your credit will be granted in SONA by the research team.</p>
+    <p style="margin:0 0 8px">Your Prolific completion code is:</p>
+    <div style="display:flex;align-items:center;gap:10px;margin:0 0 12px">
+      <input type="text" id="prolific-code" readonly style="font-size:1.1em;font-weight:bold;text-align:center;max-width:220px;background:#f5f5f5;border:1px solid #ccc;padding:8px 12px">
+      <button type="button" style="margin-top:0" onclick="copyCode(this)">Copy</button>
+    </div>
+    <p style="margin:0 0 10px">Please copy the code before clicking the button below to return to Prolific.</p>
+    <a id="credit-btn" href="#" onclick="goToCredit(event)"><button>Return to Prolific</button></a>
   </div>
   <p>Thank you once again.</p>
 </div>
@@ -371,6 +397,20 @@ const CONFIG={
   dataPipeId:'5HYh2n8mS8O8',          // DataPipe experiment ID (DataPipe saves the files to the Google Drive linked to this experiment)
   // SONA: set the study URL in SONA to  ...task.html?id=%SURVEY_CODE%
   // and paste SONA's client-side completion URL here (it ends in survey_code=XXXX; leave XXXX in place):
+  recruitment:'prolific',             // 'prolific', 'sona', or 'auto' (Prolific if the URL carries PROLIFIC_PID, otherwise SONA)
+  // Prolific: set the study URL to  ...index.html?PROLIFIC_PID={{%PROLIFIC_PID%}}&STUDY_ID={{%STUDY_ID%}}&SESSION_ID={{%SESSION_ID%}}
+  // and paste the completion code from the Prolific study setup here:
+  prolificCompletionCode:'12345',     // PLACEHOLDER: replace with the code from the Prolific study setup
+  prolificCompletionUrl:'https://www.prolific.com',   // PLACEHOLDER: replace with https://app.prolific.com/submissions/complete?cc=<YOUR CODE> (or set to '' to build it from the code)
+  // Information-preference questions from Bari & Gershman (2025), originally Pierson & Goodman (2014):
+  // 2 outcomes x 5 probabilities x 3 costs = 30 hypothetical scenarios, random order, 5-point response.
+  infoPref:{
+    position:'random',                // 'random' (50/50 per participant), 'before' (straight after consent) or 'after' (after the search task, before the questionnaires)
+    currency:'\u00a3',                // Bari & Gershman used '$' with a US sample; the amounts are identical. Change to '$' for an exact wording match.
+    amount:1000,probabilities:[1,10,50,90,99],costs:[0,5,100],
+    attentionCheck:true,              // one extra instructed-response item (not one of the 30; excluded from every score)
+    minItemMs:1000                    // answer buttons inactive for this long after each scenario appears
+  },
   sonaCreditUrl:'',                   // e.g. 'https://YOURSCHOOL.sona-systems.com/webstudy_credit.aspx?experiment_id=123&credit_token=abc...&survey_code=XXXX'
   studyTag:'tree_psych'
 };
@@ -392,16 +432,24 @@ function ts(){return Date.now()}
 const STATE={participantId:'',consentTimestamp:'',quizAttempts:0,globalTrialNum:0,currentBlockIdx:-1,currentTrialInBlock:0,
   isPractice:false,trial:null,blockDefs:[],events:[],valEstData:[],pairedChoiceData:[],
   cb:{},blockCCErrors:{},blockCCAttempts:{},blockRatings:[],qOrder:[],qi:0,q:{},demographics:{},totalScore:0,blockScores:{},
-  studyT0:ts(),csv:'',filename:'',sonaFromUrl:false};
-function readSonaId(){
-  const P=new URLSearchParams(window.location.search||'');
-  const id=(P.get('id')||P.get('survey_code')||'').trim();
-  if(id&&id!=='%SURVEY_CODE%'){
-    document.getElementById('inp-pid').value=id;STATE.sonaFromUrl=true;
+  studyT0:ts(),csv:'',filename:'',idFromUrl:false,recruitment:'',prolificStudyId:'',prolificSessionId:'',
+  infoPos:'',ip:null,ipData:[],quizInstrViews:0,leaveOk:false};
+function readUrlId(){
+  const P=new URLSearchParams(window.location.search||''),get=k=>(P.get(k)||'').trim();
+  const clean=v=>(/[%{}]/.test(v)?'':v);            // an unfilled placeholder such as %SURVEY_CODE% or {{%PROLIFIC_PID%}} counts as missing
+  const pro=clean(get('PROLIFIC_PID')),sona=clean(get('id')||get('survey_code'));
+  STATE.recruitment=CONFIG.recruitment==='auto'?(pro?'prolific':'sona'):CONFIG.recruitment;
+  document.body.classList.add('rec-'+STATE.recruitment);
+  STATE.prolificStudyId=clean(get('STUDY_ID'));STATE.prolificSessionId=clean(get('SESSION_ID'));
+  const id=STATE.recruitment==='prolific'?pro:sona;
+  if(id){
+    document.getElementById('inp-pid').value=id;STATE.idFromUrl=true;
     document.getElementById('pid-row').style.display='none';
     document.getElementById('pid-ask').style.display='none';document.getElementById('pid-auto').style.display='';
   }
+  if(STATE.recruitment==='prolific'&&!CONFIG.prolificCompletionCode)console.warn('CONFIG.prolificCompletionCode is empty: participants will not be sent back to Prolific.');
 }
+function warnLeave(e){if(STATE.leaveOk)return;e.preventDefault();e.returnValue='';}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0)}
 function randInt(n){return Math.floor(Math.random()*n)}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=randInt(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -424,8 +472,10 @@ function drawSymbol(cx,sym,x,y,r,col){
    ============================================================ */
 function submitPid(){
   const pid=document.getElementById('inp-pid').value.trim();
-  if(!pid){document.getElementById('pid-err').textContent='Please enter your SONA participant ID.';return;}
+  if(!pid){document.getElementById('pid-err').textContent='Please enter your '+(STATE.recruitment==='prolific'?'Prolific ID':'SONA participant ID')+'.';return;}
   STATE.participantId=pid;
+  const ipp=CONFIG.infoPref.position;
+  STATE.infoPos=ipp==='random'?(Math.random()<.5?'before':'after'):ipp;
   // counterbalanced: which symbol set appears first, and which symbol has which value
   const first=Math.random()<.5?'B':'C',second=first==='B'?'C':'B',SETS={B:SYM_B,C:SYM_C};
   const mapFor=syms=>{const s=shuffle(syms),m={};s.forEach((sy,i)=>{m[sy]=CONFIG.symMeans[i]});return m};
@@ -441,7 +491,8 @@ function submitPid(){
   const mapStr=sy=>sy.symbols.map(s=>symName(s)+'@'+sy.means[s]).join('|');
   STATE.cb={block_order:STATE.blockDefs.map(b=>b.id).join('>'),cost_order:costlyFirst?'costly_first':'free_first',costly_click_cost:C,
     symbol_set_sym_free:sym0.set,symbol_set_sym_costly:sym5.set,
-    symbol_values_sym_free:mapStr(sym0),symbol_values_sym_costly:mapStr(sym5),questionnaire_order:STATE.qOrder.join('>')};
+    symbol_values_sym_free:mapStr(sym0),symbol_values_sym_costly:mapStr(sym5),questionnaire_order:STATE.qOrder.join('>'),
+    info_pref_position:STATE.infoPos};
   showScreen('scr-info');
 }
 function submitConsent(){
@@ -449,14 +500,21 @@ function submitConsent(){
     document.getElementById('consent-err').textContent='Please tick all boxes and provide your initials if you would like to continue.';return;}
   STATE.consentTimestamp=new Date().toISOString();
   sendConsent();
-  showScreen('scr-instructions');
+  window.addEventListener('beforeunload',warnLeave);   // accidental close/back from here on loses the data, so ask first
+  if(STATE.infoPos==='before')showInfoPrefIntro();else showScreen('scr-instructions');
 }
 function sendConsent(){
   const sig=document.getElementById('inp-sig').value.trim().replace(/[,\n"]/g,' ');
-  const csv=['field,value','sona_id,'+STATE.participantId,'consent_timestamp,'+STATE.consentTimestamp,
+  const csv=['field,value','participant_id,'+STATE.participantId,'recruitment_source,'+STATE.recruitment,'consent_timestamp,'+STATE.consentTimestamp,
     'c1_read_information_sheet,Yes','c2_voluntary_participation,Yes','c3_data_anonymised_gdpr,Yes',
     'c4_open_access_sharing,Yes','c6_mood_questions_understood,Yes','c5_agree_to_take_part,Yes','digital_signature,'+sig].join('\n');
   sendToPipe(CONFIG.studyTag+'_p'+STATE.participantId+'_consent.csv',csv).catch(()=>{});
+}
+function toggleQuizInstr(ev){
+  ev.preventDefault();const box=document.getElementById('quiz-instr'),link=document.getElementById('quiz-instr-link');
+  if(!box.innerHTML)box.innerHTML=[...document.querySelectorAll('#scr-instructions p')].map(p=>p.outerHTML).join('');
+  const show=box.style.display==='none';box.style.display=show?'':'none';
+  link.textContent=show?'Hide the task instructions':'Show the task instructions again';if(show)STATE.quizInstrViews++;
 }
 function submitQuiz(){
   const ans={q1:'c',q2:'c',q3:'a',q4:'c',q5:'a',q6:'c',q7:'b'},e=document.getElementById('quiz-err');
@@ -512,7 +570,7 @@ function recordEvent(phase,evType,nid,trial,extra){
   const bestIdx=pv.indexOf(Math.max(...pv));let onBest='';if(nid!==null&&evType==='click')onBest=GRAPH.paths[bestIdx].includes(nid)?1:0;
   const sr=[],sc=[];for(let n=0;n<GRAPH.nodeCount;n++){sr.push(trial.rewards[n]);sc.push(trial.cues[n]||'');}
   const hasNode=nid!==null&&nid!==0;
-  const row={sona_id:STATE.participantId,block_id:bd.id,block_number:trial.isPractice?0:STATE.currentBlockIdx+1,
+  const row={participant_id:STATE.participantId,block_id:bd.id,block_number:trial.isPractice?0:STATE.currentBlockIdx+1,
     block_cue_mode:bd.cueMode,block_variance:bd.variance,block_symbol_set:bd.symbolSet,block_click_cost:bd.clickCost,
     trial_in_block:trial.trialNum,trial_global:trial.globalNum,is_practice:trial.isPractice?1:0,
     trial_type:trial.trialType,
@@ -563,8 +621,9 @@ canvas.addEventListener('click',function(e){
   for(const nid of getFrontier(t)){const[nx,ny]=GRAPH.pos[nid];if(Math.sqrt((mx-nx)**2+(my-ny)**2)<=NR+4){revealNode(t,nid);return;}}
 });
 function revealNode(t,nid){
+  const choiceSet=getFrontier(t);   // the options available when this click was made (frontier_nodes is logged after the event)
   t.revealed[nid]=true;t.clicks.push(nid);t.clickTimestamps.push(ts());
-  recordEvent('search','click',nid,t,{});
+  recordEvent('search','click',nid,t,{choice_set:choiceSet.join('|'),choice_set_size:choiceSet.length});
   document.getElementById('btn-execute').style.display=canExecute(t)?'inline-block':'none';
   updateCostBox(t,true);
   drawTrial(t);updateStatus();
@@ -582,17 +641,21 @@ function stopHere(){
 }
 function executePhase(){
   const t=STATE.trial;if(!t||t.phase!=='search'||!canExecute(t))return;
-  t.phase='execute';t.executeTime=ts();
+  t.executeTime=ts();
   recordEvent('search','stop',null,t,{});
+  t.phase='execute';
   const b=document.getElementById('btn-execute');b.style.display='none';b.blur();
   document.getElementById('btn-stop').style.display='inline-block';
   drawTrial(t);updateStatus();
 }
 document.addEventListener('keydown',function(e){
   const t=STATE.trial;if(!t||t.phase!=='execute')return;
-  if(e.key===' '||e.key==='Spacebar'){e.preventDefault();recordEvent('execute','stop_here',t.currentNode,t,{stop_method:'spacebar'});endTrial();return;}
+  if(e.key===' '||e.key==='Spacebar'){e.preventDefault();if(e.repeat)return;recordEvent('execute','stop_here',t.currentNode,t,{stop_method:'spacebar'});endTrial();return;}
+  if(!/^Arrow/.test(e.key))return;
+  e.preventDefault();
+  if(e.repeat)return;               // a held-down key must not carry the participant more than one step
   const moves=GRAPH.arrowMap[t.currentNode];if(!moves||moves[e.key]===undefined)return;
-  e.preventDefault();const target=moves[e.key];   // free movement: revealed and unrevealed locations can both be entered
+  const target=moves[e.key];   // free movement: revealed and unrevealed locations can both be entered
   const wasRevealed=t.revealed[target]?1:0;
   t.currentNode=target;t.route.push(target);t.visited[target]=true;t.moveTimestamps.push(ts());
   recordEvent('execute','move',target,t,{node_was_revealed:wasRevealed});
@@ -689,7 +752,7 @@ function nextTrial(){
 }
 function advanceToNextBlock(){
   STATE.currentBlockIdx++;
-  if(STATE.currentBlockIdx>=STATE.blockDefs.length){showScreen('scr-q-intro');return;}
+  if(STATE.currentBlockIdx>=STATE.blockDefs.length){afterMainTask();return;}
   STATE.currentTrialInBlock=0;
   const bi=STATE.currentBlockIdx,bd=STATE.blockDefs[bi],prev=bi>0?STATE.blockDefs[bi-1]:null;
   document.getElementById('block-intro-title').textContent='Block '+(bi+1)+' of '+STATE.blockDefs.length;
@@ -767,8 +830,9 @@ function afterRating(){
 }
 function endOfBlock(){
   if(STATE.currentBlockIdx<STATE.blockDefs.length-1)showScreen('scr-separator');
-  else showScreen('scr-q-intro');
+  else afterMainTask();
 }
+function afterMainTask(){if(STATE.infoPos==='after')showInfoPrefIntro();else showScreen('scr-q-intro');}
 
 /* ============================================================
    VALUE ESTIMATES
@@ -827,6 +891,84 @@ function submitPairConf(){
     chosen_side:PC.chosenSide,correct:bd.means[chosen]>bd.means[other]?1:0,confidence:parseInt(document.getElementById('conf-slider').value),
     rt_choice_ms:PC.choiceRT,rt_conf_ms:ts()-PC.confStart});
   PC.chosenSide=null;PC.idx++;showPair();
+}
+
+/* ============================================================
+   INFORMATION PREFERENCE (Bari & Gershman, 2025, Computational Psychiatry; task from Pierson & Goodman, 2014)
+   Prompt and scenario wording as published. 2 outcomes (win/lose) x 5 probabilities x 3 costs = 30 scenarios in
+   random order; responses Definitely not ... Definitely yes, saved as -2..+2 (Bari's scoring) and 1..5 (ordinal).
+   ip_cost_rank is Bari's model coding of cost ($0/$5/$100 -> 0/1/2).
+   ============================================================ */
+const IP_PROMPT='Imagine you will be locked in a room for an hour. At the end of the hour, you will be allowed to leave the room. There is a chance that something will happen to you when you leave. In each of the following situations, you will have to decide whether you want to be told at the beginning of the hour what will happen to you when you leave the room.';
+const IP_LABELS=['Definitely not','Probably not','No preference','Probably yes','Definitely yes'],IP_VALUES=[-2,-1,0,1,2];
+function ipText(it){
+  const c=CONFIG.infoPref.currency;
+  return '<span>You could <strong>'+(it.outcome==='win'?'win':'lose')+' '+c+it.amount+'</strong> with a <strong>chance of '+it.prob+'%</strong>. Would you <strong>pay '+c+it.cost+'</strong> to know now?</span>';   // one span: .q-item is flex and would drop the spaces
+}
+function ipOptsHtml(){return IP_VALUES.map((v,k)=>'<button class="q-opt" data-v="'+v+'" onclick="ipAnswer('+v+')">'+IP_LABELS[k]+'</button>').join('');}
+function showInfoPrefIntro(){
+  document.querySelectorAll('.ip-prompt-text').forEach(p=>p.textContent=IP_PROMPT);
+  document.getElementById('ip-intro-lead').textContent=STATE.infoPos==='before'
+    ?'Before the main task, we would like you to answer some short questions about imaginary situations.'
+    :'Before the final questionnaires, we would like you to answer some short questions about imaginary situations.';
+  document.getElementById('ip-intro-points').textContent=STATE.infoPos==='after'
+    ?'This part is separate from the search task: here, \u201cpay\u201d refers to imaginary money, not points.':'';
+  document.getElementById('ip-example').innerHTML=ipText({outcome:'win',amount:CONFIG.infoPref.amount,prob:90,cost:100});
+  document.getElementById('ip-example-opts').innerHTML=IP_LABELS.map(l=>'<button class="q-opt" tabindex="-1">'+l+'</button>').join('');
+  showScreen('scr-ip-intro');
+}
+function startInfoPref(){
+  const C=CONFIG.infoPref,items=[];
+  ['win','lose'].forEach(o=>C.probabilities.forEach(p=>C.costs.forEach(c=>items.push({outcome:o,amount:C.amount,prob:p,cost:c,
+    costRank:C.costs.indexOf(c),attn:false}))));
+  let order=shuffle(items);
+  if(C.attentionCheck){const at=10+randInt(11);   // somewhere between positions 11 and 21 of 31
+    order.splice(at,0,{attn:true,answer:-1,text:'To show that you are reading carefully, please select \u201cProbably not\u201d for this question.'});}
+  document.getElementById('ip-opts').innerHTML=ipOptsHtml();
+  STATE.ip={items:order,idx:0,t0:ts(),busy:false};STATE.ipData=[];
+  showScreen('scr-ip');showIpItem();
+}
+function showIpItem(){
+  const c=STATE.ip,it=c.items[c.idx],box=document.getElementById('ip-item');
+  if(it.attn)box.textContent=it.text;else box.innerHTML=ipText(it);
+  box.classList.remove('fade');
+  document.getElementById('ip-progress').textContent='Situation '+(c.idx+1)+' of '+c.items.length;
+  document.querySelectorAll('#ip-opts .q-opt').forEach(b=>{b.classList.remove('sel');b.blur();});
+  const opts=document.getElementById('ip-opts');opts.classList.add('locked');c.busy=true;c.itemT0=ts();
+  const my=c.idx;setTimeout(()=>{if(STATE.ip===c&&c.idx===my){c.busy=false;opts.classList.remove('locked');}},CONFIG.infoPref.minItemMs);
+}
+function ipAnswer(v){
+  const c=STATE.ip;if(!c||c.busy)return;c.busy=true;
+  const it=c.items[c.idx],k=IP_VALUES.indexOf(v);
+  STATE.ipData.push({position:c.idx+1,attn:it.attn,outcome:it.attn?'':it.outcome,prob:it.attn?'':it.prob,cost:it.attn?'':it.cost,
+    costRank:it.attn?'':it.costRank,response:v,label:IP_LABELS[k],rt:ts()-c.itemT0,time:ts(),
+    text:it.attn?it.text:ipText(it).replace(/<[^>]+>/g,''),attnPass:it.attn?(v===it.answer?1:0):''});
+  document.querySelectorAll('#ip-opts .q-opt').forEach(b=>b.classList.toggle('sel',+b.dataset.v===v));
+  document.getElementById('ip-item').classList.add('fade');
+  setTimeout(()=>{c.idx++;if(c.idx<c.items.length)showIpItem();else finishInfoPref();},300);
+}
+function finishInfoPref(){
+  STATE.ip.duration=ts()-STATE.ip.t0;
+  if(STATE.infoPos==='before')showScreen('scr-ip-end');else showScreen('scr-q-intro');
+}
+function afterInfoPref(){showScreen('scr-instructions');}
+function ipRows(){
+  return STATE.ipData.map(d=>({participant_id:STATE.participantId,block_id:'info_pref',block_number:'',phase:'info_pref',
+    event_type:d.attn?'attention_check':'response',event_timestamp_ms:d.time,
+    ip_item_position:d.position,ip_outcome:d.outcome,ip_outcome_value:d.attn?'':(d.outcome==='win'?1:-1)*CONFIG.infoPref.amount,
+    ip_probability:d.prob,ip_cost:d.cost,ip_cost_rank:d.costRank,ip_response:d.response,ip_response_ordinal:d.response+3,
+    ip_response_label:d.label,ip_rt_ms:d.rt,ip_attention_pass:d.attnPass,ip_text:d.text}));
+}
+function ipSummary(){
+  const r=STATE.ipData.filter(d=>!d.attn),mean=a=>a.length?Math.round(a.reduce((x,d)=>x+d.response,0)/a.length*1000)/1000:'';
+  const out={info_pref_position:STATE.infoPos,info_pref_n:r.length,info_pref_mean:mean(r),
+    info_pref_mean_win:mean(r.filter(d=>d.outcome==='win')),info_pref_mean_lose:mean(r.filter(d=>d.outcome==='lose')),
+    info_pref_duration_ms:STATE.ip&&STATE.ip.duration?STATE.ip.duration:'',
+    info_pref_n_distinct_responses:new Set(r.map(d=>d.response)).size};
+  CONFIG.infoPref.costs.forEach(c=>{out['info_pref_mean_cost'+c]=mean(r.filter(d=>d.cost===c));});
+  CONFIG.infoPref.probabilities.forEach(p=>{out['info_pref_mean_p'+p]=mean(r.filter(d=>d.prob===p));});
+  const a=STATE.ipData.find(d=>d.attn);out.attn_info_pref_pass=a?a.attnPass:'';
+  return out;
 }
 
 /* ============================================================
@@ -933,8 +1075,10 @@ function finishQ(){
 function scoreQuestionnaires(){
   const r=k=>STATE.q[k]?STATE.q[k].resp:{},sum=(o,ids)=>ids.reduce((a,id)=>a+(o[id]||0),0),rng=(p,a,b)=>{const x=[];for(let i=a;i<=b;i++)x.push(p+i);return x};
   const stai=r('stai'),sticsa=r('sticsa'),out={};
-  // STAI-T: raw responses (1 = Almost never ... 4 = Almost always) are saved as stai1..stai20; stai<i>_scored is coded
-  // as in Bari & Gershman (4 = high anxiety, anxiety-absent items reversed as 5 - response).
+  // Coded as in Bari & Gershman (2025): every item 1-4 with 4 = high anxiety. STAI responses are 1 = Almost never ...
+  // 4 = Almost always, and the nine anxiety-absent items are reverse-coded IN PLACE (stai<i> = 5 - response), so
+  // stai1..stai20 already hold the scored values. STICSA: 1 = Not at all ... 4 = Very much so (no reversed items).
+  // <item>_question and <item>_response hold the item wording and the label the participant chose, for checking.
   const staiScored={};for(let i=1;i<=20;i++){const v=stai['stai'+i];staiScored[i]=(v===undefined)?'':(STAI_REVERSE.includes(i)?5-v:v);}
   out.stait_total=Object.values(staiScored).reduce((a,v)=>a+(v===''?0:v),0);
   out.sticsat_somatic=sum(sticsa,STICSA_SOMATIC.map(i=>'sticsa'+i));
@@ -945,10 +1089,14 @@ function scoreQuestionnaires(){
   out.attention_checks_passed=out.attn_stai_pass+out.attn_sticsa_pass;
   out.attention_checks_total=2;
   ['stai','sticsa'].forEach(k=>{
-    Q_DEFS[k].items.forEach(it=>{out[it.id]=r(k)[it.id];out[it.id+'_rt']=STATE.q[k]&&STATE.q[k].item_rts?STATE.q[k].item_rts[it.id]:'';});
+    const qd=Q_DEFS[k];
+    qd.items.forEach(it=>{const v=r(k)[it.id];
+      out[it.id+'_question']=it.text;
+      out[it.id+'_response']=v===undefined?'':qd.labels[qd.values.indexOf(v)];
+      out[it.id]=v===undefined?'':(k==='stai'&&!it.attn&&STAI_REVERSE.includes(+it.id.slice(4))?5-v:v);
+      out[it.id+'_rt']=STATE.q[k]&&STATE.q[k].item_rts?STATE.q[k].item_rts[it.id]:'';});
     out[k+'_rt_ms']=STATE.q[k]?STATE.q[k].rt_ms:'';out[k+'_position']=STATE.q[k]?STATE.q[k].position:'';
   });
-  for(let i=1;i<=20;i++)out['stai'+i+'_scored']=staiScored[i];
   return out;
 }
 
@@ -978,25 +1126,43 @@ function finishStudy(){
   STATE.csv=buildCSV();
   const d=new Date();
   STATE.filename=CONFIG.studyTag+'_'+STATE.participantId+'_'+d.toISOString().slice(0,10)+'_'+d.toTimeString().slice(0,8).replace(/:/g,'-')+'.csv';
-  STATE.uploadDone=false;
-  window.addEventListener('beforeunload',warnIfUploading);
+  showDebrief();
+  startUpload();
+}
+/* Up to 5 attempts; the debrief shows the result, and a failed save can be retried by the participant. */
+function startUpload(){
+  if(STATE.uploadPromise&&!STATE.uploadDone)return;
+  const st=document.getElementById('save-status'),rb=document.getElementById('save-retry');
+  st.textContent='Saving your responses\u2026';rb.style.display='none';STATE.uploadDone=false;
   STATE.uploadPromise=(async()=>{
     let ok=false;
     for(let attempt=1;attempt<=5&&!ok;attempt++){
       try{const res=await sendToPipe(STATE.filename,STATE.csv);ok=!!(res&&res.ok);}catch(e){ok=false;}
       if(!ok&&attempt<5)await new Promise(r=>setTimeout(r,1500*attempt));
     }
-    STATE.uploadOk=ok;STATE.uploadDone=true;window.removeEventListener('beforeunload',warnIfUploading);return ok;
+    STATE.uploadOk=ok;STATE.uploadDone=true;if(ok)STATE.leaveOk=true;
+    st.textContent=ok?'Your responses have been saved.':'We could not save your responses. Please check your internet connection and click \u2018Try saving again\u2019 before leaving this page.';
+    rb.style.display=ok?'none':'';
+    return ok;
   })();
-  showDebrief();
 }
-function warnIfUploading(e){if(!STATE.uploadDone){e.preventDefault();e.returnValue='';}}
 async function goToCredit(ev){
   ev.preventDefault();const a=document.getElementById('credit-btn');if(a.dataset.busy)return;a.dataset.busy='1';
-  const b=a.querySelector('button');b.textContent='Please wait\u2026';
+  const b=a.querySelector('button'),old=b.innerHTML;b.textContent='Please wait\u2026';
   if(STATE.uploadPromise)await Promise.race([STATE.uploadPromise,new Promise(r=>setTimeout(r,20000))]);
-  window.removeEventListener('beforeunload',warnIfUploading);
+  if(!STATE.uploadOk&&!confirm('Your responses have not been saved yet. Leave anyway?')){b.innerHTML=old;delete a.dataset.busy;return;}
+  STATE.leaveOk=true;
   window.location.href=a.href;
+}
+function copyCode(btn){
+  const el=document.getElementById('prolific-code'),done=()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',1500);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,()=>{el.select();document.execCommand('copy');done();});
+  else{el.select();document.execCommand('copy');done();}
+}
+function completionUrl(){
+  const id=encodeURIComponent(STATE.participantId);
+  if(STATE.recruitment==='prolific')return CONFIG.prolificCompletionUrl||(CONFIG.prolificCompletionCode?'https://app.prolific.com/submissions/complete?cc='+encodeURIComponent(CONFIG.prolificCompletionCode):'');
+  return CONFIG.sonaCreditUrl?CONFIG.sonaCreditUrl.replace('XXXX',id).replace('{ID}',id):'';
 }
 function showDebrief(){
   document.getElementById('debrief-total').textContent=STATE.totalScore;
@@ -1004,10 +1170,8 @@ function showDebrief(){
   STATE.blockDefs.forEach((bd,i)=>{const tr=document.createElement('tr');
     tr.innerHTML='<td style="padding:4px 16px;border-bottom:1px solid #ddd;text-align:center">'+(i+1)+'</td><td style="padding:4px 16px;border-bottom:1px solid #ddd;text-align:center">'+(STATE.blockScores[bd.id]||0)+'</td>';
     tbody.appendChild(tr);});
-  if(CONFIG.sonaCreditUrl){
-    const u=CONFIG.sonaCreditUrl.replace('XXXX',encodeURIComponent(STATE.participantId)).replace('{ID}',encodeURIComponent(STATE.participantId));
-    const a=document.getElementById('credit-btn');a.href=u;a.style.display='';
-    document.getElementById('credit-auto').style.display='';document.getElementById('credit-manual').style.display='none';}
+  document.getElementById('prolific-code').value=CONFIG.prolificCompletionCode;
+  document.getElementById('credit-btn').href=completionUrl();
   showScreen('scr-debrief');
 }
 function sendToPipe(filename,csv){
@@ -1018,16 +1182,18 @@ function sendToPipe(filename,csv){
 }
 function buildCSV(){
   const nav=typeof navigator!=='undefined'?navigator:{},scr=typeof screen!=='undefined'?screen:{};
-  const pd={session_datetime:new Date().toISOString(),recruitment_source:'sona',sona_id_from_url:STATE.sonaFromUrl?1:0,consent_timestamp:STATE.consentTimestamp,
+  const pd={session_datetime:new Date().toISOString(),recruitment_source:STATE.recruitment,id_from_url:STATE.idFromUrl?1:0,
+    prolific_study_id:STATE.prolificStudyId,prolific_session_id:STATE.prolificSessionId,consent_timestamp:STATE.consentTimestamp,
     session_duration_ms:ts()-STATE.studyT0,user_agent:(nav.userAgent||''),
     viewport:(typeof window!=='undefined'&&window.innerWidth?window.innerWidth+'x'+window.innerHeight:''),
     screen_size:(scr.width?scr.width+'x'+scr.height:''),
-    quiz_attempts:STATE.quizAttempts,score_total:STATE.totalScore,
+    quiz_attempts:STATE.quizAttempts,quiz_instructions_views:STATE.quizInstrViews,score_total:STATE.totalScore,
     age:STATE.demographics.age||'',gender:STATE.demographics.gender||'',english_first:STATE.demographics.english||'',
     diag_answered:STATE.demographics.diag_answered,diag_depression:STATE.demographics.diag_depression,diag_anxiety:STATE.demographics.diag_anxiety,diag_ocd:STATE.demographics.diag_ocd,
     diag_none:STATE.demographics.diag_none,diag_prefer_not_to_say:STATE.demographics.diag_prefer_not_to_say,
     cfg_depth_sd_nonsymbolic:[1,2,3].map(d=>CONFIG.depthSD[d]).join('|'),cfg_sym_means:CONFIG.symMeans.join('|'),cfg_sym_sd:CONFIG.symSD,cfg_q_min_item_ms:CONFIG.qMinItemMs,cfg_counterbalance_cost_order:CONFIG.counterbalanceCostOrder?1:0,
-    cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,cfg_free_movement:CONFIG.freeMovement?1:0};
+    cfg_trials_per_block:CONFIG.trialsPerBlock,cfg_new_symbols_for_costly:CONFIG.newSymbolsForCost5?1:0,cfg_costly_click_cost:CONFIG.costlyClickCost,cfg_free_movement:CONFIG.freeMovement?1:0,
+    cfg_info_pref_position_setting:CONFIG.infoPref.position,cfg_info_pref_currency:CONFIG.infoPref.currency,cfg_info_pref_min_item_ms:CONFIG.infoPref.minItemMs};
   Object.assign(pd,STATE.cb);
   STATE.blockDefs.forEach((bd,i)=>{pd['score_'+bd.id]=STATE.blockScores[bd.id]||0;pd['block_cc_errors_'+bd.id]=STATE.blockCCErrors[bd.id]||0;pd['block_cc_attempts_'+bd.id]=STATE.blockCCAttempts[bd.id]||0;});
   STATE.blockRatings.forEach(r=>{pd['self_rating_'+r.blockId]=r.rating;pd['self_rating_rt_'+r.blockId]=r.rt;});
@@ -1042,21 +1208,23 @@ function buildCSV(){
       pd[k+'left']=p.left;pd[k+'right']=p.right;pd[k+'chosen']=p.chosen;pd[k+'correct']=p.correct;
       pd[k+'conf']=p.confidence;pd[k+'rt']=p.rt_choice_ms;});
   });
-  Object.assign(pd,scoreQuestionnaires());
-  const rows=STATE.events.map(e=>Object.assign({},e,pd));
-  if(!rows.length)rows.push(Object.assign({sona_id:STATE.participantId},pd));
-  const lead=['session_datetime','sona_id','recruitment_source','block_id','block_number','block_cue_mode','block_variance','block_symbol_set','block_click_cost','trial_in_block','trial_global',
+  Object.assign(pd,scoreQuestionnaires(),ipSummary());
+  if(pd.attn_info_pref_pass!==''){pd.attention_checks_passed+=pd.attn_info_pref_pass;pd.attention_checks_total+=1;}
+  const rows=STATE.events.concat(ipRows()).map(e=>Object.assign({},e,pd));
+  if(!rows.length)rows.push(Object.assign({participant_id:STATE.participantId},pd));
+  const lead=['session_datetime','participant_id','recruitment_source','block_id','block_number','block_cue_mode','block_variance','block_symbol_set','block_click_cost','trial_in_block','trial_global',
     'is_practice','trial_type','phase','event_type','event_timestamp_ms','event_time_in_trial_ms','node_id','node_depth','node_value','node_cue',
-    'node_cue_mean','node_on_exp_best_route','click_number','route','route_values','path_reward','click_cost','trial_score',
+    'node_cue_mean','node_on_exp_best_route','click_number','choice_set','choice_set_size','route','route_values','path_reward','click_cost','trial_score',
     'n_clicks','n_clicks_d1','n_clicks_d2','n_clicks_d3','prop_nodes_revealed','first_click_depth','n_clicks_on_route','n_clicks_off_route',
     'n_clicks_after_route_revealed','n_route_unrevealed','route_unrevealed_reward','executed_without_clicking','exp_best_route','exp_best_net','exp_second_net','exp_margin','chose_exp_best_route','exp_shortfall',
-    'score_total','stait_total','sticsat_somatic','sticsat_cognitive','sticsat_total','attention_checks_passed'];
+    'ip_item_position','ip_outcome','ip_outcome_value','ip_probability','ip_cost','ip_cost_rank','ip_response','ip_response_ordinal','ip_response_label','ip_rt_ms',
+    'score_total','info_pref_position','info_pref_mean','stait_total','sticsat_somatic','sticsat_cognitive','sticsat_total','attention_checks_passed','attention_checks_total'];
   const ks=new Set();rows.forEach(r=>Object.keys(r).forEach(k=>ks.add(k)));
   const keys=[...lead.filter(k=>ks.has(k)),...[...ks].filter(k=>!lead.includes(k))];
   const esc=v=>{const s=(v===undefined||v===null)?'':String(v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
   return keys.join(',')+'\n'+rows.map(r=>keys.map(k=>esc(r[k])).join(',')).join('\n');
 }
-readSonaId();
+readUrlId();
 </script>
 </body>
 </html>
