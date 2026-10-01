@@ -313,6 +313,8 @@ body.rec-sona .only-prolific{display:none}
   <div class="form-row"><label>Age</label><input type="number" id="demo-age" min="16" max="99" style="max-width:120px"> <label style="font-weight:normal;display:inline;margin-left:12px"><input type="checkbox" id="demo-age-pnts" onchange="if(this.checked){document.getElementById('demo-age').value='';document.getElementById('demo-age').disabled=true;}else{document.getElementById('demo-age').disabled=false;}"> Prefer not to say</label></div>
   <div class="form-row"><label>Gender</label><select id="demo-gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option></select></div>
   <div class="form-row"><label>Is English your first language?</label><select id="demo-english"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
+  <div class="form-row"><label>Are you currently taking any prescribed medication for depression?</label><select id="demo-med-dep"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
+  <div class="form-row"><label>Are you currently taking any prescribed medication for anxiety?</label><select id="demo-med-anx"><option value="">Select…</option><option>Yes</option><option>No</option><option>Prefer not to say</option></select></div>
   <div class="form-row"><label>Have you ever received a formal diagnosis from a health professional of any of the following? (optional; tick all that apply)</label>
     <div class="consent-item"><input type="checkbox" class="diag" id="diag-depression" onchange="diagChanged(this)"><span>Depression</span></div>
     <div class="consent-item"><input type="checkbox" class="diag" id="diag-anxiety" onchange="diagChanged(this)"><span>An anxiety disorder (for example, generalised anxiety disorder, panic disorder or social anxiety disorder)</span></div>
@@ -330,8 +332,8 @@ body.rec-sona .only-prolific{display:none}
   <p>Thank you for completing this study. The total number of points you earned is <strong id="debrief-total"></strong>.</p>
   <p>Below is a breakdown of points by block.</p>
   <table style="border-collapse:collapse;margin:12px 0;max-width:400px"><thead><tr><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Block</th><th style="padding:6px 16px;border-bottom:2px solid #999;text-align:center">Points</th></tr></thead><tbody id="debrief-block-rows"></tbody></table>
-  <div class="credit-box"><p style="margin:0" id="save-status">Saving your responses&hellip;</p>
-    <button id="save-retry" style="display:none" onclick="startUpload()">Try saving again</button></div>
+  <div class="credit-box" id="save-box" style="display:none"><p style="margin:0" id="save-status"></p>
+    <button id="save-retry" onclick="startUpload()">Try again</button></div>
   <p>Understanding agentic behaviour is at the frontier of cognitive neuroscience. This study investigated how people search for information and make decisions under uncertainty &mdash; for example, how much they check before committing, and how this changes when information is free or costly &mdash; and whether these patterns relate to everyday experiences of anxiety (including its physical and cognitive aspects) and low mood. In the questions about imaginary situations, you told us whether you would want to know in advance what was going to happen, even though knowing could not change the outcome; these questions come from a previous study of anxiety and information seeking (Bari &amp; Gershman, 2025), so that we can compare our results directly with theirs. The questionnaires you completed are widely used research measures; they are not a diagnosis.</p>
 
   <div class="support">
@@ -359,6 +361,7 @@ body.rec-sona .only-prolific{display:none}
       <li><strong>Hub of Hope</strong> &mdash; search for local mental health support near you. <a href="https://hubofhope.co.uk" target="_blank" rel="noopener">hubofhope.co.uk</a></li>
     </ul>
     <p class="only-prolific" style="margin-top:12px">If you live outside the UK, please contact your local emergency services or a local helpline.</p>
+    <button type="button" id="pdf-btn" onclick="downloadSupportPdf()">Download these resources (PDF)</button>
   </div>
 
   <p>If you have any questions or concerns about this work, please contact project lead Dr Sam Jones via email at <a href="mailto:samuel.jones@bangor.ac.uk">samuel.jones@bangor.ac.uk</a>. Alternatively, please contact Bangor University's Senior Research Governance &amp; Policy Officer at <a href="mailto:seniorresearchgovofficer@bangor.ac.uk">seniorresearchgovofficer@bangor.ac.uk</a>.</p>
@@ -922,8 +925,8 @@ function startInfoPref(){
   ['win','lose'].forEach(o=>C.probabilities.forEach(p=>C.costs.forEach(c=>items.push({outcome:o,amount:C.amount,prob:p,cost:c,
     costRank:C.costs.indexOf(c),attn:false}))));
   let order=shuffle(items);
-  if(C.attentionCheck){const at=10+randInt(11);   // somewhere between positions 11 and 21 of 31
-    order.splice(at,0,{attn:true,answer:-1,text:'To show that you are reading carefully, please select \u201cProbably not\u201d for this question.'});}
+  if(C.attentionCheck){const at=Math.floor(order.length/2);   // midway: after 15 scenarios, i.e. situation 16 of 31
+    order.splice(at,0,{attn:true,answer:0,text:'To show that you are reading carefully, please select \u201cNo preference\u201d for this question.'});}
   document.getElementById('ip-opts').innerHTML=ipOptsHtml();
   STATE.ip={items:order,idx:0,t0:ts(),busy:false};STATE.ipData=[];
   showScreen('scr-ip');showIpItem();
@@ -1111,11 +1114,11 @@ function diagChanged(el){
 }
 function submitDemographics(){
   const agePnts=document.getElementById('demo-age-pnts').checked,ageVal=document.getElementById('demo-age').value;
-  const gen=document.getElementById('demo-gender').value,eng=document.getElementById('demo-english').value;
-  if((!agePnts&&!ageVal)||!gen||!eng){document.getElementById('demo-err').textContent='Please complete each field to continue (each has a "Prefer not to say" option).';return;}
+  const gen=document.getElementById('demo-gender').value,eng=document.getElementById('demo-english').value,medDep=document.getElementById('demo-med-dep').value,medAnx=document.getElementById('demo-med-anx').value;
+  if((!agePnts&&!ageVal)||!gen||!eng||!medDep||!medAnx){document.getElementById('demo-err').textContent='Please complete each field to continue (each has a "Prefer not to say" option).';return;}
   document.getElementById('demo-err').textContent='';
   const dg=id=>document.getElementById('diag-'+id).checked?1:0,answered=[...document.querySelectorAll('.diag')].some(c=>c.checked);
-  STATE.demographics={age:agePnts?'Prefer not to say':ageVal,gender:gen,english:eng,
+  STATE.demographics={age:agePnts?'Prefer not to say':ageVal,gender:gen,english:eng,medication_depression:medDep,medication_anxiety:medAnx,
     diag_answered:answered?1:0,diag_depression:answered?dg('depression'):'',diag_anxiety:answered?dg('anxiety'):'',diag_ocd:answered?dg('ocd'):'',
     diag_none:answered?dg('none'):'',diag_prefer_not_to_say:answered?dg('pnts'):''};
   finishStudy();
@@ -1132,8 +1135,8 @@ function finishStudy(){
 /* Up to 5 attempts; the debrief shows the result, and a failed save can be retried by the participant. */
 function startUpload(){
   if(STATE.uploadPromise&&!STATE.uploadDone)return;
-  const st=document.getElementById('save-status'),rb=document.getElementById('save-retry');
-  st.textContent='Saving your responses\u2026';rb.style.display='none';STATE.uploadDone=false;
+  const box=document.getElementById('save-box'),st=document.getElementById('save-status');
+  box.style.display='none';STATE.uploadDone=false;
   STATE.uploadPromise=(async()=>{
     let ok=false;
     for(let attempt=1;attempt<=5&&!ok;attempt++){
@@ -1141,8 +1144,8 @@ function startUpload(){
       if(!ok&&attempt<5)await new Promise(r=>setTimeout(r,1500*attempt));
     }
     STATE.uploadOk=ok;STATE.uploadDone=true;if(ok)STATE.leaveOk=true;
-    st.textContent=ok?'Your responses have been saved.':'We could not save your responses. Please check your internet connection and click \u2018Try saving again\u2019 before leaving this page.';
-    rb.style.display=ok?'none':'';
+    // participants see nothing when the save works; only a failed save (after 5 attempts) is shown, so it can be retried
+    if(!ok){st.textContent='There was a problem connecting to our server. Please check your internet connection and click \u2018Try again\u2019 before leaving this page.';box.style.display='';}
     return ok;
   })();
 }
@@ -1153,6 +1156,32 @@ async function goToCredit(ev){
   if(!STATE.uploadOk&&!confirm('Your responses have not been saved yet. Leave anyway?')){b.innerHTML=old;delete a.dataset.busy;return;}
   STATE.leaveOk=true;
   window.location.href=a.href;
+}
+/* Builds a PDF of the Support box (plus the research team's contact details) in the browser with jsPDF, loaded only
+   when the button is clicked. If the library cannot be loaded, the browser's print dialog opens instead ('Save as PDF'). */
+function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);});}
+async function downloadSupportPdf(){
+  const btn=document.getElementById('pdf-btn'),label=btn.textContent;btn.disabled=true;btn.textContent='Preparing PDF\u2026';
+  try{
+    if(!(window.jspdf&&window.jspdf.jsPDF))await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,M=18,TW=W-2*M;let y=M;
+    const txt=el=>{let t='';el.childNodes.forEach(n=>{if(n.nodeType===3)t+=n.textContent;else if(n.tagName==='A'){const h=n.getAttribute('href').replace(/^mailto:/,'');t+=n.textContent.trim()===h||n.textContent.includes(h.replace(/^https?:\/\/(www\.)?/,''))?n.textContent:n.textContent+' ('+h+')';}else t+=txt(n);});return t.replace(/\s+/g,' ').replace(/[\u2018\u2019]/g,"'").replace(/[\u201c\u201d]/g,'"').replace(/\u2013/g,'-').replace(/\u2014/g,' - ').replace(/\s+/g,' ').trim();};
+    const put=(str,size,style,indent,gap)=>{doc.setFont('helvetica',style);doc.setFontSize(size);
+      const lines=doc.splitTextToSize(str,TW-indent),lh=size*0.45;
+      lines.forEach(l=>{if(y+lh>297-M){doc.addPage();y=M;}doc.text(l,M+indent,y);y+=lh;});y+=gap;};
+    put('Support resources',16,'bold',0,3);
+    document.querySelectorAll('#scr-debrief .support > h3, #scr-debrief .support > p, #scr-debrief .support li').forEach(el=>{
+      if(el.offsetParent===null)return;   // skip anything hidden
+      if(el.tagName==='H3')put(txt(el),12,'bold',0,2);
+      else if(el.tagName==='LI')put('\u2022  '+txt(el),10,'normal',3,1.5);
+      else put(txt(el),10,'normal',0,3);
+    });
+    y+=3;put('Contact the research team',12,'bold',0,2);
+    const contact=[...document.querySelectorAll('#scr-debrief > p')].find(p=>p.textContent.includes('questions or concerns'));
+    if(contact)put(txt(contact),10,'normal',0,0);
+    doc.save('support_resources.pdf');
+  }catch(e){window.print();}
+  btn.disabled=false;btn.textContent=label;
 }
 function copyCode(btn){
   const el=document.getElementById('prolific-code'),done=()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',1500);};
@@ -1188,7 +1217,7 @@ function buildCSV(){
     viewport:(typeof window!=='undefined'&&window.innerWidth?window.innerWidth+'x'+window.innerHeight:''),
     screen_size:(scr.width?scr.width+'x'+scr.height:''),
     quiz_attempts:STATE.quizAttempts,quiz_instructions_views:STATE.quizInstrViews,score_total:STATE.totalScore,
-    age:STATE.demographics.age||'',gender:STATE.demographics.gender||'',english_first:STATE.demographics.english||'',
+    age:STATE.demographics.age||'',gender:STATE.demographics.gender||'',english_first:STATE.demographics.english||'',medication_depression:STATE.demographics.medication_depression||'',medication_anxiety:STATE.demographics.medication_anxiety||'',
     diag_answered:STATE.demographics.diag_answered,diag_depression:STATE.demographics.diag_depression,diag_anxiety:STATE.demographics.diag_anxiety,diag_ocd:STATE.demographics.diag_ocd,
     diag_none:STATE.demographics.diag_none,diag_prefer_not_to_say:STATE.demographics.diag_prefer_not_to_say,
     cfg_depth_sd_nonsymbolic:[1,2,3].map(d=>CONFIG.depthSD[d]).join('|'),cfg_sym_means:CONFIG.symMeans.join('|'),cfg_sym_sd:CONFIG.symSD,cfg_q_min_item_ms:CONFIG.qMinItemMs,cfg_counterbalance_cost_order:CONFIG.counterbalanceCostOrder?1:0,
