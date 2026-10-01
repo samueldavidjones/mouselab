@@ -265,7 +265,8 @@ body.rec-sona .only-prolific{display:none}
   <p class="mt">You will then see a series of situations like this example:</p>
   <div class="q-item" id="ip-example" style="margin-bottom:12px"></div>
   <div class="q-opts locked" id="ip-example-opts"></div>
-  <p class="mt">For each situation, choose the answer that best describes what you would do. There are no right or wrong answers, but please read and answer carefully: <strong>this section includes an attention check</strong>.</p>
+  <p class="mt" id="ip-structure"></p>
+  <p>For each situation, choose the answer that best describes what you would do. There are no right or wrong answers, but please read and answer carefully: <strong>this section includes an attention check</strong>.</p>
   <p><strong>These situations are imaginary. Your answers will not affect your points, raffle tickets or payment.</strong> <span id="ip-intro-points"></span></p>
   <button class="go-btn" onclick="startInfoPref()">Begin</button>
 </div>
@@ -423,9 +424,10 @@ const CONFIG={
    ============================================================ */
 const GRAPH={children:{0:[1,5,9,13],1:[2],5:[6],9:[10],13:[14],2:[3,4],6:[7,8],10:[11,12],14:[15,16],3:[],4:[],7:[],8:[],11:[],12:[],15:[],16:[]},parent:{0:null,1:0,5:0,9:0,13:0,2:1,6:5,10:9,14:13,3:2,4:2,7:6,8:6,11:10,12:10,15:14,16:14},depth:{0:0,1:1,5:1,9:1,13:1,2:2,6:2,10:2,14:2,3:3,4:3,7:3,8:3,11:3,12:3,15:3,16:3},pos:{0:[350,250],1:[350,170],2:[350,90],3:[280,30],4:[420,30],5:[430,250],6:[510,250],7:[570,180],8:[570,320],9:[350,330],10:[350,410],11:[280,470],12:[420,470],13:[270,250],14:[190,250],15:[130,180],16:[130,320]},arrowMap:{0:{ArrowUp:1,ArrowRight:5,ArrowDown:9,ArrowLeft:13},1:{ArrowUp:2},2:{ArrowLeft:3,ArrowRight:4},5:{ArrowRight:6},6:{ArrowUp:7,ArrowDown:8},9:{ArrowDown:10},10:{ArrowLeft:11,ArrowRight:12},13:{ArrowLeft:14},14:{ArrowUp:15,ArrowDown:16}},nodeCount:17,terminals:[3,4,7,8,11,12,15,16],paths:[[0,1,2,3],[0,1,2,4],[0,5,6,7],[0,5,6,8],[0,9,10,11],[0,9,10,12],[0,13,14,15],[0,13,14,16]],d1:[1,5,9,13]};
 
-const SYM_B=['λ','Ψ','Π','Φ'];
-const SYM_C=['✕','○','□','△'];
-const SYM_SAFE={'λ':'lambda','Ψ':'psi','Π':'pi','Φ':'phi','✕':'cross','○':'circle','□':'square','△':'triangle','?':'?'};
+// Two sets with no shared shapes; lookalikes (hourglass vs triangle/cross) are kept in different sets.
+const SYM_B=['△','✕','∿','‖'];   // triangle, cross, wave, two lines
+const SYM_C=['○','□','⧗','∴'];   // circle, square, hourglass, three dots
+const SYM_SAFE={'✕':'cross','○':'circle','□':'square','△':'triangle','∿':'wave','‖':'lines','⧗':'hourglass','∴':'dots','?':'?'};
 const symName=s=>SYM_SAFE[s]||s;
 
 /* ============================================================
@@ -467,6 +469,10 @@ function drawSymbol(cx,sym,x,y,r,col){
   else if(sym==='○'){cx.beginPath();cx.arc(x,y,r*.75,0,Math.PI*2);cx.stroke();}
   else if(sym==='□'){const s=r*.7;cx.strokeRect(x-s,y-s,s*2,s*2);}
   else if(sym==='✕'){const s=r*.6;cx.beginPath();cx.moveTo(x-s,y-s);cx.lineTo(x+s,y+s);cx.stroke();cx.beginPath();cx.moveTo(x+s,y-s);cx.lineTo(x-s,y+s);cx.stroke();}
+  else if(sym==='∿'){const s=r*.75;cx.beginPath();cx.moveTo(x-s,y);cx.bezierCurveTo(x-s*.5,y-s*.9,x-s*.1,y-s*.9,x,y);cx.bezierCurveTo(x+s*.1,y+s*.9,x+s*.5,y+s*.9,x+s,y);cx.stroke();}
+  else if(sym==='‖'){const s=r*.65;cx.beginPath();cx.moveTo(x-s*.4,y-s);cx.lineTo(x-s*.4,y+s);cx.moveTo(x+s*.4,y-s);cx.lineTo(x+s*.4,y+s);cx.stroke();}
+  else if(sym==='⧗'){const s=r*.62;cx.beginPath();cx.moveTo(x-s,y-s);cx.lineTo(x+s,y-s);cx.lineTo(x-s,y+s);cx.lineTo(x+s,y+s);cx.closePath();cx.stroke();}
+  else if(sym==='∴'){[[0,-.45],[-.5,.4],[.5,.4]].forEach(([dx,dy])=>{cx.beginPath();cx.arc(x+dx*r,y+dy*r,r*.17,0,Math.PI*2);cx.fill();});}
   else{cx.font=`bold ${r*1.8}px Georgia`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(sym,x,y);}
 }
 
@@ -916,6 +922,8 @@ function showInfoPrefIntro(){
     :'Before the final questionnaires, we would like you to answer some short questions about imaginary situations.';
   document.getElementById('ip-intro-points').textContent=STATE.infoPos==='after'
     ?'This part is separate from the search task: here, \u201cpay\u201d refers to imaginary money, not points.':'';
+  {const C=CONFIG.infoPref,c=C.currency,lst=a=>a.slice(0,-1).join(', ')+' or '+a[a.length-1];   // Bari & Gershman: participants were told how the scenarios vary
+   document.getElementById('ip-structure').textContent='The situations are shown in random order. They differ in whether you could win or lose '+c+C.amount+', the chance of this happening ('+lst(C.probabilities.map(p=>p+'%'))+'), and the cost of being told now ('+lst(C.costs.map(x=>c+x))+').';}
   document.getElementById('ip-example').innerHTML=ipText({outcome:'win',amount:CONFIG.infoPref.amount,prob:90,cost:100});
   document.getElementById('ip-example-opts').innerHTML=IP_LABELS.map(l=>'<button class="q-opt" tabindex="-1">'+l+'</button>').join('');
   showScreen('scr-ip-intro');
