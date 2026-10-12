@@ -78,7 +78,7 @@ body.rec-sona .only-prolific{display:none}
   <h2>What is the purpose of this study?</h2>
   <p>This study will help us understand how people search for information and make decisions under uncertainty. Improving our understanding of these processes could have implications for education, health, and everyday decision-making.</p>
   <h2>What is involved in the study?</h2>
-  <p>We will explain a decision-making task and ask a few comprehension questions so that we can be sure you understand the task before you begin. You will then complete four blocks of the task. After some blocks we will ask a few short questions about what you learned. You will also answer about short questions about an imaginary situation. Finally, you will complete two short questionnaires about how you generally feel, and some optional demographic questions. The whole study should take approximately 25 minutes.</p>
+  <p>We will explain a decision-making task and ask a few comprehension questions so that we can be sure you understand the task before you begin. You will then complete four blocks of the task. After some blocks we will ask a few short questions about what you learned. You will also answer short questions about an imaginary situation. Finally, you will complete two short questionnaires about how you generally feel, and some optional demographic questions. The whole study should take approximately 25 minutes.</p>
   <h2>Are there any risks or disadvantages?</h2>
   <p>The questionnaires ask about things such as anxiety, worry, low mood and physical feelings of anxiety, which some people may find uncomfortable. You can stop at any time. The questionnaires are not a diagnostic assessment, and because your answers are anonymised we cannot give you feedback on them or contact you about them. Details of organisations that offer free, confidential support are provided at the end of the study.</p>
   <h2>What will I receive for taking part?</h2>
@@ -164,7 +164,7 @@ body.rec-sona .only-prolific{display:none}
     <label><input type="radio" name="q5" value="a"> The sum of the rewards at every location you moved onto, whether or not you revealed it</label>
     <label><input type="radio" name="q5" value="b"> Number of locations revealed</label>
     <label><input type="radio" name="q5" value="c"> The sum of the rewards you revealed</label></div>
-  <div class="quiz-q"><p>6. How do you do well in this task, maximising your chances of recieving a performance-related bonus?</p>
+  <div class="quiz-q"><p>6. How do you do well in this task, maximising your chances of receiving a performance-related bonus?</p>
     <label><input type="radio" name="q6" value="a"> Complete the task as quickly as possible</label>
     <label><input type="radio" name="q6" value="b"> Click as many locations as possible</label>
     <label><input type="radio" name="q6" value="c"> Earn as many points as possible</label></div>
@@ -767,7 +767,7 @@ function advanceToNextBlock(){
   document.getElementById('block-intro-title').textContent='Block '+(bi+1)+' of '+STATE.blockDefs.length;
   let desc='';
   if(bd.cueMode==='symbolic'&&(!prev||prev.cueMode!=='symbolic'))
-    desc+='<p>The locations will now display <strong>symbols</strong> instead of question marks. Pay very close attention to the symbols because they <strong>may help you to predict the hidden reward values, and so maximise your chances of recieving a performance-related bonus</strong>.</p>';
+    desc+='<p>The locations will now display <strong>symbols</strong> instead of question marks. Pay very close attention to the symbols because they <strong>may help you to predict the hidden reward values, and so maximise your chances of receiving a performance-related bonus</strong>.</p>';
   else if(bd.cueMode==='symbolic'&&prev.symbolSet!==bd.symbolSet)
     desc+='<p><strong>This block uses a new set of symbols.</strong> What you learned about the previous symbols does not apply to these. Again, pay close attention to them because they <strong>may help you to predict the hidden reward values</strong>.</p>';
   else if(bd.cueMode==='symbolic')
