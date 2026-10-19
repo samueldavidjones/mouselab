@@ -517,7 +517,7 @@ function sendConsent(){
   const csv=['field,value','participant_id,'+STATE.participantId,'recruitment_source,'+STATE.recruitment,'consent_timestamp,'+STATE.consentTimestamp,
     'c1_read_information_sheet,Yes','c2_voluntary_participation,Yes','c3_data_anonymised_gdpr,Yes',
     'c4_open_access_sharing,Yes','c6_mood_questions_understood,Yes','c5_agree_to_take_part,Yes','digital_signature,'+sig].join('\n');
-  sendToPipe(CONFIG.studyTag+'_p'+STATE.participantId+'_consent.csv',csv).catch(()=>{});
+    {const d=new Date();sendToPipe(CONFIG.studyTag+'_'+STATE.participantId+'_consent_'+d.toISOString().slice(0,10)+'_'+d.toTimeString().slice(0,8).replace(/:/g,'-')+'.csv',csv).catch(()=>{});}
 }
 function toggleQuizInstr(ev){
   ev.preventDefault();const box=document.getElementById('quiz-instr'),link=document.getElementById('quiz-instr-link');
@@ -1136,7 +1136,7 @@ function submitDemographics(){
 function finishStudy(){
   STATE.csv=buildCSV();
   const d=new Date();
-  STATE.filename=CONFIG.studyTag+'_'+STATE.participantId+'_'+d.toISOString().slice(0,10)+'_'+d.toTimeString().slice(0,8).replace(/:/g,'-')+'.csv';
+  STATE.filename=CONFIG.studyTag+'_'+STATE.participantId+'_data_'+d.toISOString().slice(0,10)+'_'+d.toTimeString().slice(0,8).replace(/:/g,'-')+'.csv';
   showDebrief();
   startUpload();
 }
