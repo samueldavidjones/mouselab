@@ -119,7 +119,7 @@ body.rec-sona .only-prolific{display:none}
   <p><strong>You can move onto any location, whether or not you have revealed it.</strong> You collect the reward at every location you move onto &mdash; including hidden ones, whose rewards may be positive or negative. Revealing a location simply lets you see its reward before you decide where to go. You can press 'Execute plan' at any time.</p>
   <p>You don't have to navigate to the end of a path. Just click the <strong>'Stop here'</strong> button (or press the <strong>spacebar</strong>) when navigating if you would like to stop at your current location.</p>
   <p>Your score equals <strong>the sum of the rewards at every location you moved onto</strong>, whether or not you revealed them. You do not need to search every location.</p>
-  <p><strong>Try to maximise your overall score</strong>.</p>
+  <p><strong>Try to maximise your overall score, because doing so maximises your chances of receiving a performance-related bonus.</strong></p>
   <button onclick="showScreen('scr-practice-intro')">Continue to practice</button>
 </div>
 
@@ -260,6 +260,7 @@ body.rec-sona .only-prolific{display:none}
 <div class="screen" id="scr-ip-intro">
   <h1>Decisions about information</h1>
   <p id="ip-intro-lead"></p>
+  <p id="ip-intro-points"></p>
   <p>Please read the following carefully:</p>
   <div class="ip-prompt" style="font-size:1em;color:#222"><p style="margin:0" class="ip-prompt-text"></p></div>
   <p class="mt">You will then see a series of situations like this example:</p>
@@ -267,7 +268,6 @@ body.rec-sona .only-prolific{display:none}
   <div class="q-opts locked" id="ip-example-opts"></div>
   <p class="mt" id="ip-structure"></p>
   <p>For each situation, choose the answer that best describes what you would do. There are no right or wrong answers, but please read and answer carefully: <strong>this section includes an attention check</strong>.</p>
-  <p>These situations are imaginary. Your answers will not affect your points, raffle tickets or payment. <span id="ip-intro-points"></span></p>
   <button class="go-btn" onclick="startInfoPref()">Begin</button>
 </div>
 
@@ -289,7 +289,7 @@ body.rec-sona .only-prolific{display:none}
   <h1>Some questions about you</h1>
   <p>That is the end of the tasks. Thank you.</p>
   <p>Next there are <strong>two short questionnaires</strong> about how you generally feel. They take about five minutes in total.</p>
-  <p>There are no right or wrong answers. Please answer each question honestly, based on how you have actually been feeling. Your answers do not affect your score. <strong>However, this section does include attention checks</strong>.</p>
+  <p>There are no right or wrong answers. Please answer each question honestly, based on how you have actually been feeling. Your answers do not affect your score. <strong>However, this section does include attention checks</strong>. We understand that anyone's attention can slip occasionally, so missing one is not a problem. However, in line with Prolific's guidelines, if two or more are missed we may be unable to approve your submission.</p>
   <div class="note"><p style="margin:0">Some of these questions ask about difficult feelings. Details of free, confidential support are given at the end of the study.</p></div>
   <button onclick="startQuestionnaires()">Continue</button>
 </div>
