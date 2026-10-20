@@ -391,7 +391,7 @@ const CONFIG={
   // Symbolic blocks (as in the original task): CONSTANT variance. Each symbol has one fixed value wherever it appears.
   symMeans:[8,3,-3,-8],
   symSD:2,
-  costlyClickCost:2,        // points per click in the costly blocks. With free movement, walking without clicking earns 0 on average in the
+  costlyClickCost:1,        // points per click in the costly blocks. With free movement, walking without clicking earns 0 on average in the
                             // question-mark blocks; revealing 3-4 outer locations then walking to the best one earns about +4.5 per trial at cost 2,
                             // about +2 at cost 3 (revealing 2), and nothing at cost 5 (simulated), so at 2 searching still clearly pays.
   freeMovement:true,        // execution may pass through locations not revealed during search (their hidden rewards are collected), as in Callaway et al.
@@ -726,7 +726,7 @@ function endTrial(){
 }
 function updateStatus(){
   const t=STATE.trial,el=document.getElementById('task-status'),cost=t.bd.clickCost;
-  if(t.phase==='search')el.innerHTML='<span class="phase-label phase-plan">Search</span> Click locations to reveal their values'+(cost>0?' (<strong>each click costs '+cost+' points</strong>)':'')+', then press <strong>Execute plan</strong> when you are ready. Clicks: '+t.clicks.length;
+  if(t.phase==='search')el.innerHTML='<span class="phase-label phase-plan">Search</span> Click locations to reveal their values'+(cost>0?' (<strong>each click costs '+cost+' point</strong>)':'')+', then press <strong>Execute plan</strong> when you are ready. Clicks: '+t.clicks.length;
   else if(t.phase==='execute')el.innerHTML='<span class="phase-label phase-act">Execute</span> Use <strong>arrow keys</strong> to navigate. You can move onto any location, revealed or not &mdash; you collect its reward either way. Click <strong>Stop here</strong> (or press the spacebar) if you would like to stop at your current location.';
 }
 
@@ -751,7 +751,7 @@ function nextTrial(){
     if(STATE.currentTrialInBlock>bd.trials){STATE.trial=null;afterBlock();return;}
     STATE.globalTrialNum++;
     STATE.trial=newTrial(bd,STATE.currentTrialInBlock,STATE.globalTrialNum,false);
-    document.getElementById('task-block-label').textContent='Block '+(STATE.currentBlockIdx+1)+' of '+STATE.blockDefs.length+' — Trial '+STATE.currentTrialInBlock+'/'+bd.trials+(bd.clickCost>0?' — each click costs '+bd.clickCost+' points':'');
+    document.getElementById('task-block-label').textContent='Block '+(STATE.currentBlockIdx+1)+' of '+STATE.blockDefs.length+' — Trial '+STATE.currentTrialInBlock+'/'+bd.trials+(bd.clickCost>0?' — each click costs '+bd.clickCost+' point':'');
     document.getElementById('task-score-box').style.display='inline-block';
     document.getElementById('task-score-box').textContent='Score: '+(STATE.blockScores[bd.id]||0);
   }
@@ -774,18 +774,18 @@ function advanceToNextBlock(){
     desc+='<p>The locations will again display the <strong>same symbols</strong> as in the previous block.</p>';
   const seenCost=STATE.blockDefs.slice(0,bi).some(b=>b.clickCost>0);   // costs are only ever mentioned once a costly block is reached
   if(bd.clickCost>0)
-    desc='<div class="cost-warning"><div class="cw-head">Important: in this block, every click costs '+bd.clickCost+' points</div>'+
-      '<p style="margin:0">Each location you reveal will be subtracted from your score (&minus;'+bd.clickCost+' points per click), whether or not you end up visiting it. '+
+    desc='<div class="cost-warning"><div class="cw-head">Important: in this block, every click costs '+bd.clickCost+' point</div>'+
+      '<p style="margin:0">Each location you reveal will be subtracted from your score (&minus;'+bd.clickCost+' point per click), whether or not you end up visiting it. '+
       'A red counter at the top of the screen will show how many points your clicks have cost on each trial.</p></div>'+desc;
   else if(seenCost&&prev.clickCost!==bd.clickCost)
     desc='<div class="free-notice">The cost of a click is changing: clicks are now free.</div>'+desc;
-  desc+='<p>Click locations to reveal values'+(bd.clickCost===0?(seenCost?' (<strong>free</strong>)':''):' (<strong>&minus;'+bd.clickCost+' points per click</strong>)')+', then press \'Execute plan\' and navigate using the arrow keys on your keyboard. <strong>You can move onto any location, whether or not you revealed it, and you collect the reward of every location you move onto.</strong> If you want to stop early, click \'Stop here\' (or press the spacebar).</p>';
+  desc+='<p>Click locations to reveal values'+(bd.clickCost===0?(seenCost?' (<strong>free</strong>)':''):' (<strong>&minus;'+bd.clickCost+' point per click</strong>)')+', then press \'Execute plan\' and navigate using the arrow keys on your keyboard. <strong>You can move onto any location, whether or not you revealed it, and you collect the reward of every location you move onto.</strong> If you want to stop early, click \'Stop here\' (or press the spacebar).</p>';
   desc+='<p>There are <strong>'+bd.trials+' trials</strong> in this block.</p>';
   document.getElementById('block-intro-text').innerHTML=desc;
   const symAns=bd.cueMode!=='symbolic'?'qmarks':((!prev||prev.cueMode!=='symbolic'||prev.symbolSet!==bd.symbolSet)?'new_symbols':'same_symbols');
   const Q=[];
   if(bd.clickCost>0||seenCost){
-    const costOpts=[...new Set([1,bd.clickCost||CONFIG.costlyClickCost,5])].filter(v=>v>0).sort((a,b)=>a-b)
+    const costOpts=[...new Set([1,2,5,bd.clickCost||CONFIG.costlyClickCost])].filter(v=>v>0).sort((a,b)=>a-b)
       .map(v=>[String(v),v+' point'+(v===1?'':'s')]).concat([['0','Nothing &mdash; clicks are free']]);
     Q.push({name:'bcc',text:'How many points does each click cost in this block?',answer:String(bd.clickCost),opts:costOpts});
   }
